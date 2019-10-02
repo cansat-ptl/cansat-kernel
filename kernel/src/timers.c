@@ -10,31 +10,36 @@
 static volatile struct timerStruct timerQueue[MAX_TIMER_COUNT];
 static volatile uint8_t timerIndex = 0;
 
-uint8_t kernel_setTimer(timerISR t_pointer, uint32_t t_period)
+uint8_t kernel_setTimer(timerISR t_pointer, uint32_t t_delay)
 {
 	if(!kernel_checkFlag(KFLAG_TIMER_EN)) return 2;
 		
-	if(hal_statusReg & (1 << 7)){
-		hal_disableInterrupts();
-	}
+	uint8_t sreg = hal_statusReg;
+	hal_disableInterrupts();
+	
 	for(int i = 0; i <= timerIndex; i++){
 		if(timerQueue[i].tsrPointer == t_pointer){
-			timerQueue[i].period = t_period;
-			timerQueue[i].savePeriod = t_period;
+			timerQueue[i].period = t_delay;
+			timerQueue[i].repeatPeriod = t_delay;
+			
 			hal_enableInterrupts();
+			hal_statusReg = sreg;
 			return 0;
 		}
 	}
 	if(timerIndex < MAX_TIMER_COUNT){
 		timerIndex++;
 		timerQueue[timerIndex].tsrPointer = t_pointer;
-		timerQueue[timerIndex].period = t_period;
-		timerQueue[timerIndex].savePeriod = t_period;
+		timerQueue[timerIndex].period = t_delay;
+		timerQueue[timerIndex].repeatPeriod = t_delay;
+		
 		hal_enableInterrupts();
+		hal_statusReg = sreg;
 		return 0;
 	}
 	else {
 		hal_enableInterrupts();
+		hal_statusReg = sreg;
 		return MAX_TIMER_COUNT;
 	}
 }
@@ -44,8 +49,9 @@ uint8_t kernel_removeTimer(timerISR t_pointer)
 	if(!kernel_checkFlag(KFLAG_TIMER_EN)) return 2;
 	
 	uint8_t position;
-	if(hal_statusReg & (1 << 7))
-		hal_disableInterrupts();
+	
+	uint8_t sreg = hal_statusReg;
+	hal_disableInterrupts();
 	
 	timerIndex--;
 	for(position = 0; position < MAX_TIMER_COUNT-1; position++){
@@ -61,18 +67,19 @@ uint8_t kernel_removeTimer(timerISR t_pointer)
 		}
 		timerQueue[MAX_TIMER_COUNT-1].tsrPointer = NULL;
 		timerQueue[MAX_TIMER_COUNT-1].period = 0;
+		
 		hal_enableInterrupts();
+		hal_statusReg = sreg;
 		return 0;
 	}
+	
 	hal_enableInterrupts();
+	hal_statusReg = sreg;
 	return 0;
 }
 
 inline void kernel_timerService()
 {
-	kernel_setFlag(KFLAG_TIMER_ISR, 1);
-	if(hal_statusReg & (1 << 7))
-		hal_disableInterrupts();
 	for(int i = 0; i < MAX_TIMER_COUNT; i++){
 		if(timerQueue[i].tsrPointer == NULL) continue;
 		else {
@@ -80,11 +87,9 @@ inline void kernel_timerService()
 				timerQueue[i].period--;
 			else {
 				if(timerQueue[i].tsrPointer != NULL) (timerQueue[i].tsrPointer)(); //Additional NULLPTR protection
-				timerQueue[i].period = timerQueue[i].savePeriod;
+				timerQueue[i].period = timerQueue[i].repeatPeriod;
 			}
 		}
 	}
-	kernel_setFlag(KFLAG_TIMER_ISR, 0);
-	hal_enableInterrupts();
 }
 #endif

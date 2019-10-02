@@ -105,3 +105,32 @@ uint8_t hal_digitalRead(uint8_t pin)
 		return 0xFF;
 	}
 }
+
+void hal_setupTimer1A(uint8_t prescaler)
+{
+	uint8_t sreg = hal_statusReg;
+	hal_disableInterrupts();
+	TCCR1B |= (1 << WGM12)|(prescaler << CS10); // prescaler 64 cs11 & cs10 = 1
+	TCNT1 = 0;
+	OCR1A = 125;
+	hal_enableInterrupts();
+	hal_statusReg = sreg;
+}
+
+void hal_startTimer1A()
+{
+	uint8_t sreg = hal_statusReg;
+	hal_disableInterrupts();
+	TIMSK |= (1 << OCIE1A);
+	hal_enableInterrupts();
+	hal_statusReg = sreg;
+}
+
+void hal_stopTimer1A()
+{
+	uint8_t sreg = hal_statusReg;
+	hal_disableInterrupts();
+	TIMSK &= ~(1 << OCIE1A);
+	hal_enableInterrupts();
+	hal_statusReg = sreg;
+}

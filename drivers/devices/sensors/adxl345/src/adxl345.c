@@ -10,7 +10,7 @@ void adxl345_pinSetup(){
 	ADXL345_DDR |= (1<<ADXL345_CS);
 	hal_writePin(&ADXL345_PORT, ADXL345_CS, 1);
 	hal_writePin(&ADXL345_PORT, ADXL345_CS, 0);
-	delay(20);
+	delay_ms(20);
 	hal_writePin(&ADXL345_PORT, ADXL345_CS, 1);
 }
 

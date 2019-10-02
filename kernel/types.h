@@ -20,7 +20,8 @@ typedef uint8_t byte;
 
 struct taskStruct {
 	task pointer;
-	uint16_t period;
+	uint16_t delay;
+	uint16_t repeatPeriod;
 	uint8_t priority;
 	uint8_t state;
 };
@@ -28,7 +29,7 @@ struct taskStruct {
 struct timerStruct {
 	timerISR tsrPointer;
 	uint32_t period;
-	uint32_t savePeriod;
+	uint32_t repeatPeriod;
 };
 
 struct commandStruct {

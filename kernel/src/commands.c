@@ -7,6 +7,8 @@
 #include "../kernel.h"
 #include "../drivers.h"
 
+#if KERNEL_CLI_MODULE == 1
+
 #ifndef CMD_COMMAND_AMOUNT
 #define CMD_COMMAND_AMOUNT 9
 #endif
@@ -288,7 +290,7 @@ void dickbutt()
 void kernel_initCLI()
 {
 	wdt_reset();
-	delay(500);
+	delay_ms(500);
 	debug_logMessage(PGM_ON, L_NONE, PSTR("\x0C"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR("Initializing shell...\r\n\r\n"));
 	kernel_registerCommand("config", config);	
@@ -301,7 +303,7 @@ void kernel_initCLI()
 	kernel_registerCommand("dickbutt", dickbutt);
 	sei();
 	wdt_reset();
-	delay(500);
+	delay_ms(500);
 	debug_logMessage(PGM_ON, L_NONE, PSTR("\x0C"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR("+-----------------------------------------------------------------+\r\n"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR("|                       CanSat shell v0.0.1                       |\r\n"));
@@ -332,3 +334,10 @@ ISR(USART0_RX_vect)
 	}
 	//debug_logMessage(PGM_ON, L_INFO, PSTR("RX0_ISR\r\n"));
 }
+
+#else
+ISR(USART0_RX_vect)
+{
+	;
+}
+#endif

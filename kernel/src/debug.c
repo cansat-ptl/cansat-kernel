@@ -16,8 +16,6 @@ void sd_puts(char * data);
 void sd_flush();
 
 #if KERNEL_DEBUG_MODULE == 1
-#define SD_LOGGING 0
-#define UART_LOGGING_I 0
 
 char levels[5][16] = {
 	"",
@@ -118,18 +116,14 @@ inline void debug_logMessage(uint8_t pgm, uint8_t level, const char * format, ..
 		va_list args;
 		va_start(args, format);
 		if(!pgm){
-			#if UART_LOGGING_I == 0
-				debug_sendMessage(level, format, args);
-			#endif
-			#ifdef SD_LOGGING
+			debug_sendMessage(level, format, args);
+			#if KERNEL_SD_MODULE == 1
 				debug_sendMessageSD(level, format, args);
 			#endif
 		}
 		else {
-			#if UART_LOGGING_I == 0
-				debug_sendMessage_p(level, format, args);
-			#endif
-			#ifdef SD_LOGGING
+			debug_sendMessage_p(level, format, args);
+			#if KERNEL_SD_MODULE == 1
 				debug_sendMessageSD_p(level, format, args);
 			#endif
 		}

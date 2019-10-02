@@ -29,7 +29,6 @@ int idle(){
 int systemInit();
 void init(); //System init task, MUST me declared in tasks.c
 void initTaskManager(); //Task manager init task, MUST me declared in tasks.c
-static void kernel_handleError(uint8_t error);
 
 inline void kernel_setFlag(uint8_t flag, uint8_t value)
 {
@@ -92,7 +91,8 @@ static inline uint8_t kernel_getMaxQueueSize(uint8_t t_priority){
 
 static inline void kernel_resetTaskByPosition(uint8_t position){
 	taskQueue[position].pointer = idle;
-	taskQueue[position].period = 0;
+	taskQueue[position].delay = 0;
+	taskQueue[position].repeatPeriod = 0;
 	taskQueue[position].priority = PRIORITY_LOW;
 	taskQueue[position].state = KSTATE_ACTIVE;
 }
@@ -117,7 +117,9 @@ inline uint8_t kernel_addCall(task t_ptr, uint8_t t_priority)
 		return 0;
 	}
 	else {
-		kernel_handleError(ERR_QUEUE_OVERFLOW);
+		#if KERNEL_UTIL_MODULE == 1
+			util_displayError(ERR_QUEUE_OVERFLOW);
+		#endif
 		kernel_clearCallQueue(0);
 		kernel_clearCallQueue(1);
 		kernel_clearCallQueue(2);
@@ -130,7 +132,7 @@ inline uint8_t kernel_addCall(task t_ptr, uint8_t t_priority)
 	}
 }
 
-uint8_t kernel_addTask(task t_ptr, uint16_t t_period, uint8_t t_priority, uint8_t startupState)
+uint8_t kernel_addTask(uint8_t taskType, task t_ptr, uint16_t t_delay, uint8_t t_priority, uint8_t startupState)
 {
 	if(kernel_checkFlag(KFLAG_DEBUG) && VERBOSE)
 		debug_logMessage(PGM_ON, L_INFO, (char *)PSTR("kernel: Added timed task to queue\r\n"));
@@ -140,9 +142,11 @@ uint8_t kernel_addTask(task t_ptr, uint16_t t_period, uint8_t t_priority, uint8_
 		
 	for(int i = 0; i <= taskIndex; i++){
 		if(taskQueue[i].pointer == t_ptr){
-			taskQueue[i].period = t_period;
+			taskQueue[i].repeatPeriod = t_delay;
 			taskQueue[i].priority = t_priority;
 			taskQueue[i].state = startupState;
+			if(taskType == TASK_REPEATED) taskQueue[i].repeatPeriod = t_delay;
+			else taskQueue[i].repeatPeriod = 0;
 			
 			hal_enableInterrupts();
 			hal_statusReg = sreg;
@@ -152,16 +156,20 @@ uint8_t kernel_addTask(task t_ptr, uint16_t t_period, uint8_t t_priority, uint8_
 	if(taskIndex < MAX_TASK_QUEUE_SIZE){
 		taskIndex++;
 		taskQueue[taskIndex].pointer = t_ptr;
-		taskQueue[taskIndex].period = t_period;
+		taskQueue[taskIndex].delay = t_delay;
 		taskQueue[taskIndex].priority = t_priority;
 		taskQueue[taskIndex].state = startupState;
+		if(taskType == TASK_REPEATED) taskQueue[taskIndex].repeatPeriod = t_delay;
+		else taskQueue[taskIndex].repeatPeriod = 0;
 		
 		hal_enableInterrupts();
 		hal_statusReg = sreg;
 		return 0;
 	}
 	else {
-		kernel_handleError(ERR_QUEUE_OVERFLOW);
+		#if KERNEL_UTIL_MODULE == 1
+			util_displayError(ERR_QUEUE_OVERFLOW);
+		#endif
 		kernel_clearCallQueue(0);
 		kernel_clearCallQueue(1);
 		kernel_clearCallQueue(2);
@@ -299,66 +307,6 @@ uint8_t kernel_setTaskState(task t_pointer, uint8_t state)
 	return 1;
 }
 
-inline static void kernel_taskService()
-{
-	kernel_setFlag(KFLAG_TIMER_ISR, 1);
-	hal_disableInterrupts();
-	
-	for(int i = 0; i < MAX_TASK_QUEUE_SIZE; i++){
-		if(taskQueue[i].pointer == idle) continue;
-		else {
-			if(taskQueue[i].period != 0)
-				taskQueue[i].period--;
-			else {
-				if(taskQueue[i].state == KSTATE_ACTIVE){
-					kernel_addCall(taskQueue[i].pointer, taskQueue[i].priority);
-					kernel_removeTask(i);
-				}
-			}
-		}
-	}
-	e_time += 1;
-	hal_enableInterrupts();
-	kernel_setFlag(KFLAG_TIMER_ISR, 0);
-}
-
-void kernel_setupTimer()
-{
-	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("                         [DONE]\r\n"));
-	uint8_t sreg = hal_statusReg;
-	hal_disableInterrupts();
-	TCCR1B |= (1 << WGM12)|(KERNEL_TIMER_PRESCALER << CS10); // prescaler 64 cs11 & cs10 = 1
-	TCNT1 = 0; 
-	OCR1A = 125;
-	hal_enableInterrupts();
-	hal_statusReg = sreg;
-	kernel_setFlag(KFLAG_TIMER_SET, 1);
-}
-
-void kernel_startTimer()
-{
-	if(kernel_checkFlag(KFLAG_TIMER_SET)){
-		uint8_t sreg = hal_statusReg;
-		hal_disableInterrupts();
-		TIMSK |= (1 << OCIE1A);
-		hal_enableInterrupts();
-		hal_statusReg = sreg;
-		kernel_setFlag(KFLAG_TIMER_EN, 1);
-	}
-}
-
-void kernel_stopTimer()
-{
-	if(kernel_checkFlag(KFLAG_TIMER_SET)){
-		uint8_t sreg = hal_statusReg;
-		hal_disableInterrupts();
-		TIMSK &= ~(1 << OCIE1A);
-		hal_enableInterrupts();
-		hal_statusReg = sreg;
-		kernel_setFlag(KFLAG_TIMER_EN, 0);
-	}
-}
-
 inline static uint8_t kernel_taskManager()
 {
 	if((callQueueP0[0] != idle || callQueueP0[1] != idle)){
@@ -419,11 +367,42 @@ static uint8_t kernel()
 	while(1){
 		wdt_reset();
 		uint8_t taskReturnCode = kernel_taskManager();
-		if(taskReturnCode != 0) kernel_handleError(taskReturnCode);
+		#if KERNEL_UTIL_MODULE == 1
+			if(taskReturnCode != 0) util_displayError(taskReturnCode);
+		#endif
 		hal_switchBit(&LED_KRN_PORT, LED_KRN);
 		hal_enableInterrupts();
 	}
 	return ERR_KRN_RETURN;
+}
+
+void kernel_startTimer()
+{
+	if(kernel_checkFlag(KFLAG_TIMER_SET)){
+		#ifdef KERNEL_USE_TIMER_1A
+			hal_startTimer1A();
+			kernel_setFlag(KFLAG_TIMER_EN, 1);
+		#endif
+	}
+}
+
+void kernel_stopTimer()
+{
+	if(kernel_checkFlag(KFLAG_TIMER_SET)){
+		#ifdef KERNEL_USE_TIMER_1A
+			hal_stopTimer1A();
+			kernel_setFlag(KFLAG_TIMER_EN, 0);
+		#endif
+	}
+}
+
+void kernel_setupTimer()
+{
+	#ifdef KERNEL_USE_TIMER_1A
+		hal_setupTimer1A(KERNEL_TIMER_PRESCALER);
+	#endif
+	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("                         [DONE]\r\n"));
+	kernel_setFlag(KFLAG_TIMER_SET, 1);
 }
 
 uint8_t kernelInit()
@@ -468,6 +447,7 @@ uint8_t kernelInit()
 	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: Starting timer"));
 	kernel_setupTimer();
 	kernel_startTimer();
+	kernel_setFlag(KFLAG_TIMER_EN, 1);
 	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: Starting kernel"));
 	kernel();
 	
@@ -477,62 +457,51 @@ uint8_t kernelInit()
 void kernel_checkMCUCSR()
 {
 	if(hal_checkBit_m(mcucsr_mirror, WDRF)){
-		kernel_handleError(ERR_WDT_RESET);
+		#if KERNEL_UTIL_MODULE == 1
+			util_displayError(ERR_WDT_RESET);
+		#endif
 		hal_setBit_m(kflags, WDRF);
 		return;
 	}
 	if(hal_checkBit_m(mcucsr_mirror, BORF)){
-		kernel_handleError(ERR_BOD_RESET);
+		#if KERNEL_UTIL_MODULE == 1
+			util_displayError(ERR_BOD_RESET);
+		#endif
 		hal_setBit_m(kflags, BORF);
 	}
 	return;
 }
 
-static void kernel_handleError(uint8_t error)
+
+inline static void kernel_taskService()
 {
-	if(kernel_checkFlag(KFLAG_DEBUG)){
-		switch(error){
-			case ERR_QUEUE_OVERFLOW:
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("\r\n--------------------------------------------------------------------------------\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] A task/call queue overflow has occurred.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] This is a critical issue, and immediate action is required.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] Task manager will be reloaded and reset.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] Please, report this to the developer as soon as possible.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] Error details: MAX_QUEUE_SIZE >= callIndex/taskIndex\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("--------------------------------------------------------------------------------\r\n\r\n"));
-			break;
-			case ERR_WDT_RESET:
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("\r\n--------------------------------------------------------------------------------\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] The system has been reset by watchdog.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] This is usually caused by software issues or faulty device connections.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] Please, report this to the developer as soon as possible.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] Error details: MCUCSR.WDRF = 1\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("--------------------------------------------------------------------------------\r\n\r\n"));
-			break;
-			case ERR_BOD_RESET:
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("\r\n--------------------------------------------------------------------------------\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] The system has been reset by brown-out detector.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] This is usually caused by an unstable power supply.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] Please, check power supply wire connections and circuitry as soon as possible.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] Error details: MCUCSR.BORF = 1\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("--------------------------------------------------------------------------------\r\n\r\n"));
-			break;
-			case ERR_DEVICE_FAIL:
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("\r\n--------------------------------------------------------------------------------\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] A major device failure has been reported by one of the tasks.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] To prevent damage and data corruption, the task has been suspended.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] Please, check your device connections and circuitry as soon as possible.\r\n"));
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[FATAL] Error details: taskReturnCode = ERR_DEVICE_FAIL\r\n")); //TODO: implement verbose error info, e.g what device has failed
-				debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("--------------------------------------------------------------------------------\r\n\r\n"));
-			break;
+	for(int i = 0; i < MAX_TASK_QUEUE_SIZE; i++){
+		if(taskQueue[i].pointer == idle) continue;
+		else {
+			if(taskQueue[i].delay != 0)
+			taskQueue[i].delay--;
+			else {
+				if(taskQueue[i].state == KSTATE_ACTIVE){
+					kernel_addCall(taskQueue[i].pointer, taskQueue[i].priority);
+					if(taskQueue[i].repeatPeriod == 0) kernel_removeTask(i);
+					else taskQueue[i].delay = taskQueue[i].repeatPeriod;
+				}
+			}
 		}
 	}
+	e_time += 1;
 }
 
 ISR(TIMER1_COMPA_vect)
 {
+	hal_setBit_m(kflags, KFLAG_TIMER_ISR);
+	hal_disableInterrupts();
+	
 	kernel_taskService();
 	#ifndef USE_EXTERNAL_TIMER
 		kernel_timerService();
 	#endif
+	
+	hal_enableInterrupts();
+	hal_clearBit_m(kflags, KFLAG_TIMER_ISR);
 }

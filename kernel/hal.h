@@ -59,7 +59,7 @@
 
 #define hal_statusReg SREG
 #define hal_nop() asm volatile ("NOP")
-#define delay(x) _delay_ms(x);
+#define delay_ms(x) _delay_ms(x);
 
 #define hal_setBit_m(x,y) x |= (1 << y)
 #define hal_clearBit_m(x,y) x &= ~(1 << y)
@@ -74,9 +74,14 @@ inline volatile uint8_t hal_checkBit(volatile uint8_t *reg, uint8_t bit);
 inline void hal_writePin(volatile uint8_t *port, uint8_t pin, uint8_t value);
 inline volatile uint8_t hal_readPin(volatile uint8_t *port, uint8_t pin);
 inline void hal_setPinMode(volatile uint8_t *ddr, uint8_t pin, uint8_t value);
+
 void hal_pinMode(uint8_t pin, uint8_t value);
 void hal_digitalWrite(uint8_t pin, uint8_t value);
 uint8_t hal_digitalRead(uint8_t pin);
+
+void hal_stopTimer1A();
+void hal_startTimer1A();
+void hal_setupTimer1A(uint8_t prescaler);
 
 inline void hal_switchBit(volatile uint8_t *reg, uint8_t bit){
 	*reg ^= (1 << bit);

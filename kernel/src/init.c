@@ -13,7 +13,7 @@ void w2_init();
 
 void initTaskManager()
 {
-	kernel_addTask(systemInit, 0, PRIORITY_HIGH, KSTATE_ACTIVE);
+	kernel_addTask(TASK_SINGLERUN, systemInit, 0, PRIORITY_HIGH, KSTATE_ACTIVE);
 	//kernel_addTask(imu_filter, 50, PRIORITY_HIGH, KSTATE_ACTIVE);
 	//kernel_addTask(checkDeployment, 100, PRIORITY_LOW, KSTATE_ACTIVE);
 	//kernel_addTask(readADXL, 200, PRIORITY_NORM, KSTATE_ACTIVE);
@@ -104,7 +104,9 @@ int systemInit()
 	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("                       [DONE]\r\n"), 0, 1);
 	
 	rx0_enableInterrupt();
-	kernel_initCLI();
+	#if KERNEL_CLI_MODULE == 1
+		kernel_initCLI();
+	#endif
 	kernel_setFlag(KFLAG_INIT, 0);
 	return 0;
 }
@@ -119,7 +121,7 @@ void init()
 	kernel_checkMCUCSR();
 	
 	hal_enableInterrupts();
-	delay(10);
+	delay_ms(10);
 	
 	if(hal_checkBit_m(JUMPER_PIN, JUMPER_IN)){
 		kernel_setFlag(KFLAG_DEBUG, 1);

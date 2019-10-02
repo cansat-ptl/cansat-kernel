@@ -8,7 +8,7 @@
 #ifndef KERNEL_H_
 #define KERNEL_H_
 
-#define KERNEL_VER "0.4.1-bleeding"
+#define KERNEL_VER "0.5.1-bleeding"
 #define KERNEL_TIMESTAMP __TIMESTAMP__
 
 #define SDCARD_MOD_VER "0.0.5-rc1"
@@ -54,6 +54,9 @@
 #define KSTATE_ACTIVE 1
 #define KSTATE_SUSPENDED 0
 
+#define TASK_SINGLERUN 0
+#define TASK_REPEATED 1
+
 void init();
 int systemInit();
 void initTaskManager();
@@ -63,7 +66,7 @@ uint8_t kernel_checkFlag(uint8_t flag) __attribute__ ((section (".kernel")));
 uint64_t kernel_getUptime() __attribute__ ((section (".kernel")));
 
 uint8_t kernel_addCall(task t_ptr, uint8_t t_priority) __attribute__ ((section (".kernel"))); 
-uint8_t kernel_addTask(task t_ptr, uint16_t t_period, uint8_t t_priority, uint8_t startupState) __attribute__ ((section (".kernel")));
+uint8_t kernel_addTask(uint8_t taskType, task t_ptr, uint16_t t_delay, uint8_t t_priority, uint8_t startupState) __attribute__ ((section (".kernel")));
 uint8_t kernel_removeCall(uint8_t t_priority) __attribute__ ((section (".kernel")));
 uint8_t kernel_removeTask(uint8_t position) __attribute__ ((section (".kernel")));
 uint8_t kernel_setTaskState(task t_pointer, uint8_t state) __attribute__ ((section (".kernel")));
@@ -72,10 +75,12 @@ void kernel_clearCallQueue(uint8_t t_priority) __attribute__ ((section (".kernel
 void kernel_checkMCUCSR() __attribute__ ((section (".kernel")));
 uint8_t kernelInit() __attribute__ ((section (".kernel")));
 
+void kernel_stopTimer() __attribute__ ((section (".kernel")));
+void kernel_startTimer() __attribute__ ((section (".kernel")));
+void kernel_setupTimer() __attribute__ ((section (".kernel")));
+
 #ifdef KERNEL_TIMER_MODULE
-	void kernel_stopTimer() __attribute__ ((section (".kernel")));
-	void kernel_startTimer() __attribute__ ((section (".kernel")));
-	uint8_t kernel_setTimer(timerISR t_pointer, uint32_t t_period) __attribute__ ((section (".kernel")));
+	uint8_t kernel_setTimer(timerISR t_pointer, uint32_t t_delay) __attribute__ ((section (".kernel")));
 	uint8_t kernel_removeTimer(timerISR t_pointer) __attribute__ ((section (".kernel")));
 	void kernel_timerService() __attribute__ ((section (".kernel")));
 #endif
@@ -97,6 +102,7 @@ uint8_t kernelInit() __attribute__ ((section (".kernel")));
 	#define util_getArrayLength_m(arr) ((int)(sizeof(arr) / sizeof(arr)[0]))
 	void util_printVersion() __attribute__ ((section (".kernel")));
 	uint8_t util_strCompare(char * a, char * b, uint8_t len) __attribute__ ((section (".kernel")));
+	void util_displayError(uint8_t error);
 #endif
 
 //#ifdef KERNEL_CLI_MODULE
@@ -108,7 +114,7 @@ uint8_t kernelInit() __attribute__ ((section (".kernel")));
 	
 
 #ifdef KERNEL_DEBUG_MODULE
-	#define DBG_MOD_VER "0.9.1-staging"
+	#define DBG_MOD_VER "0.5.1-bleeding"
 	#define DBG_MOD_TIMESTAMP __TIMESTAMP__
 	#define PGM_ON 1
 	#define PGM_OFF 0

@@ -12,6 +12,9 @@
 #ifndef KERNELconfig
 #define KERNELconfig
 
+	//#define KERNEL_USE_TIMER_0
+	#define KERNEL_USE_TIMER_1A
+
 	#define MAX_TIMER_COUNT 3
 	#define MAX_TASK_QUEUE_SIZE 16
 	#define MAX_HIGHPRIO_CALL_QUEUE_SIZE 8
@@ -32,11 +35,11 @@
 	
 	#define FORCE_LOWERPRIO_THRESHOLD 10
 
-	#define KERNEL_SD_MODULE 1
+	#define KERNEL_SD_MODULE 0
 	#define KERNEL_WDT_MODULE 1
 	#define KERNEL_UTIL_MODULE 1
 	#define KERNEL_DEBUG_MODULE 1
-	#define KERNEL_CLI_MODULE 1
+	#define KERNEL_CLI_MODULE 0
 	#define KERNEL_TIMER_MODULE 1
 	
 	#define UART_LOGGING 1
