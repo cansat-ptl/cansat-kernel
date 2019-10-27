@@ -330,7 +330,7 @@ ISR(USART0_RX_vect)
 		recvBuffer[recvBuffer_i-1] = '\0';
 		rx0_disableInterrupt();
 		//kernel_processCommand();
-		kernel_addCall(kernel_processCommand, PRIORITY_LOW);
+		kernel_addCall(kernel_processCommand, KPRIO_LOW);
 	}
 	//debug_logMessage(PGM_ON, L_INFO, PSTR("RX0_ISR\r\n"));
 }

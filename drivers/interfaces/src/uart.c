@@ -31,7 +31,7 @@ volatile unsigned char creg1 = 0;
 //#if UART1_USE_EXT_TX_ISR == 1
 	volatile char tx1_buffer[128] = "";
 	volatile int tx1_pointer = 0;
-//#ednif
+//#endif
 volatile char *tx1_data;
 volatile int tx1_size = 0;
 

@@ -56,6 +56,9 @@
 
 #define hal_disableInterrupts() cli()
 #define hal_enableInterrupts() sei()
+#define hal_setupSystemTimer() hal_setupTimer1A(KERNEL_TIMER_PRESCALER)
+#define hal_startSystemTimer() hal_startTimer1A()
+#define hal_stopSystemTimer() hal_stopTimer1A()
 
 #define hal_statusReg SREG
 #define hal_nop() asm volatile ("NOP")

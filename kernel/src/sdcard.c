@@ -43,22 +43,32 @@ void sd_readPtr()
 	#endif
 }
 
+void sd_putc(char data)
+{
+	#if KERNEL_SD_MODULE == 1
+		if(sd_index < 512){
+			sd_buffer0[sd_index] = data;
+			sd_index++;
+		}
+		else {
+			if(sd_index >= 512 && sd_index < 768-1){
+				sd_buffer1[sd_index - 512] = data;
+				sd_buffer1[(sd_index - 512)+1] = 0;
+				sd_index++;
+			}
+		}
+		if(sd_index >= 512) sd_flush();
+	#else
+		#warning Trying to use disabled SD card module, this may spawn dragons
+	#endif
+}
+
 void sd_puts(char * data)
 {
 	#if KERNEL_SD_MODULE == 1
 		int i;
 		for(i = 0; i < strlen(data); i++){
-			if(sd_index < 512){
-				sd_buffer0[sd_index] = data[i];
-				sd_index++;
-			}
-			else {
-				if(sd_index >= 512 && sd_index < 768-1){
-					sd_buffer1[sd_index - 512] = data[i];
-					sd_buffer1[(sd_index - 512)+1] = 0;
-					sd_index++;
-				}
-			}
+			sd_putc(data[i]);
 		}
 		if(sd_index >= 512)
 		sd_flush();

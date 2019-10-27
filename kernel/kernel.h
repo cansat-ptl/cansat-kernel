@@ -37,9 +37,9 @@
 #define ERR_KRN_RETURN 5
 #define ERR_DEVICE_FAIL 6
 	
-#define PRIORITY_HIGH 0
-#define PRIORITY_NORM 1
-#define PRIORITY_LOW 2
+#define KPRIO_HIGH 0
+#define KPRIO_NORM 1
+#define KPRIO_LOW 2
 	
 #define KFLAG_INIT 0
 #define KFLAG_TIMER_SET 1
@@ -54,8 +54,8 @@
 #define KSTATE_ACTIVE 1
 #define KSTATE_SUSPENDED 0
 
-#define TASK_SINGLERUN 0
-#define TASK_REPEATED 1
+#define KTASK_SINGLERUN 0
+#define KTASK_REPEATED 1
 
 void init();
 int systemInit();
@@ -86,6 +86,7 @@ void kernel_setupTimer() __attribute__ ((section (".kernel")));
 #endif
 
 #ifdef KERNEL_SD_MODULE
+	void sd_putc(char data) __attribute__ ((section (".kernel")));
 	void sd_puts(char * data) __attribute__ ((section (".kernel")));
 	void sd_flush() __attribute__ ((section (".kernel")));
 	void sd_readPtr() __attribute__ ((section (".kernel")));
@@ -114,19 +115,22 @@ void kernel_setupTimer() __attribute__ ((section (".kernel")));
 	
 
 #ifdef KERNEL_DEBUG_MODULE
-	#define DBG_MOD_VER "0.5.1-bleeding"
+	#define DBG_MOD_VER "0.6.0-bleeding"
 	#define DBG_MOD_TIMESTAMP __TIMESTAMP__
 	#define PGM_ON 1
 	#define PGM_OFF 0
+	#define PGM_PUTS 2
 	#define L_NONE 0
 	#define L_INFO 1
 	#define L_WARN 2
 	#define L_ERROR 3
 	#define L_FATAL 4
-	void debug_sendMessage(uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
-	void debug_sendMessageSD(uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
-	void debug_sendMessage_p(uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
-	void debug_sendMessageSD_p(uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
+	void debug_sendMessage(char * buffer, uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
+	void debug_sendMessageSD(char * buffer, uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
+	void debug_sendMessage_p(char * buffer, uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
+	void debug_sendMessageSD_p(char * buffer, uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
+	void debug_puts(uint8_t level, const char * message) __attribute__ ((section (".kernel")));
+	void debug_putsSD(uint8_t level, const char * message) __attribute__ ((section (".kernel")));
 	void debug_logMessage(uint8_t pgm, uint8_t level, const char * format, ...) __attribute__ ((section (".kernel")));
 #endif
 
