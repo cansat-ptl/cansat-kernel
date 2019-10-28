@@ -8,13 +8,13 @@
 #ifndef KERNEL_H_
 #define KERNEL_H_
 
-#define KERNEL_VER "0.5.1-bleeding"
+#define KERNEL_VER "0.6.0-bleeding"
 #define KERNEL_TIMESTAMP __TIMESTAMP__
 
 #define SDCARD_MOD_VER "0.0.5-rc1"
 #define SDCARD_MOD_TIMESTAMP __TIMESTAMP__
 
-#define CMD_MOD_VER "0.0.1-bleeding"
+#define CMD_MOD_VER "0.0.2-bleeding"
 #define CMD_MOD_TIMESTAMP __TIMESTAMP__
 
 #include "types.h"
@@ -101,7 +101,6 @@ void kernel_setupTimer() __attribute__ ((section (".kernel")));
 
 #ifdef KERNEL_UTIL_MODULE
 	#define util_getArrayLength_m(arr) ((int)(sizeof(arr) / sizeof(arr)[0]))
-	void util_printVersion() __attribute__ ((section (".kernel")));
 	uint8_t util_strCompare(char * a, char * b, uint8_t len) __attribute__ ((section (".kernel")));
 	void util_displayError(uint8_t error);
 #endif

@@ -18,7 +18,6 @@
 #include <stdio.h>
 #include <util/delay.h>
 #include "kernel/kernel.h"
-#include "drivers/driver_config.h"
 //----------------------------------------------------------------
 
 #endif /* CONFIG_H_ */

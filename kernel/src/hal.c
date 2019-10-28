@@ -134,3 +134,67 @@ void hal_stopTimer1A()
 	hal_enableInterrupts();
 	hal_statusReg = sreg;
 }
+
+void hal_setupTimer0(uint8_t prescaler)
+{
+	uint8_t sreg = hal_statusReg;
+	hal_disableInterrupts();
+	TCCR0 |= (1 << WGM12)|(prescaler << CS10); // prescaler 64 cs11 & cs10 = 1
+	TCNT0 = 0;
+	OCR0 = 125;
+	hal_enableInterrupts();
+	hal_statusReg = sreg;
+}
+
+void hal_startTimer0()
+{
+	uint8_t sreg = hal_statusReg;
+	hal_disableInterrupts();
+	TIMSK |= (1 << OCIE0);
+	hal_enableInterrupts();
+	hal_statusReg = sreg;
+}
+
+void hal_stopTimer0()
+{
+	uint8_t sreg = hal_statusReg;
+	hal_disableInterrupts();
+	TIMSK &= ~(1 << OCIE0);
+	hal_enableInterrupts();
+	hal_statusReg = sreg;
+}
+
+int hal_basicUart_init(unsigned int ubrr)
+{
+	UBRR0H = 0;
+	UBRR0L = 12;
+	UCSR0B = (1<<RXEN)|(1<<TXEN)|(1<<RXCIE)|(0<<TXCIE)|(0<<UDRIE);
+	UCSR0C = (0<<USBS)|(1<<UCSZ00)|(1<<UCSZ01)|(0<<UCSZ02)|(0<<UPM00)|(0<<UPM01)|(0<<UMSEL0);
+	return 0;
+}
+
+void hal_basicUart_putc(char c)
+{
+	UDR0 = c;
+	while(!(UCSR0A & (1<<UDRE)));
+}
+
+void hal_basicUart_puts(char * msg)
+{
+	int i = 0;
+	while(msg[i] != '\0'){
+		UDR0 = msg[i];
+		while(!(UCSR0A & (1<<UDRE)));
+		i++;
+	}
+}
+
+void hal_basicUart_enableInterruptsRX()
+{
+	UCSR0B |= (1 << RXCIE);
+}
+
+void hal_basicUart_disableInterruptsRX()
+{
+	UCSR0B &= ~(1 << RXCIE);
+}

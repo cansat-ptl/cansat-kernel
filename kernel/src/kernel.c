@@ -6,7 +6,7 @@
  */ 
 
 #include "../kernel.h"
-#include "../drivers.h"
+#include "../hal.h"
 
 static volatile uint16_t kflags = 0;
 static volatile uint16_t kflags_mirror __attribute__ ((section (".noinit")));
@@ -141,7 +141,6 @@ inline uint8_t kernel_addCall(task t_ptr, uint8_t t_priority)
 		kernel_clearCallQueue(1);
 		kernel_clearCallQueue(2);
 		kernel_clearTaskQueue();
-		initTaskManager();
 		
 		hal_enableInterrupts();
 		hal_statusReg = sreg;
@@ -191,7 +190,6 @@ uint8_t kernel_addTask(uint8_t taskType, task t_ptr, uint16_t t_delay, uint8_t t
 		kernel_clearCallQueue(1);
 		kernel_clearCallQueue(2);
 		kernel_clearTaskQueue();
-		initTaskManager();
 		
 		hal_enableInterrupts();
 		hal_statusReg = sreg;
@@ -389,8 +387,10 @@ static uint8_t kernel()
 {
 	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                        [DONE]\r\n"));
 	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Starting task manager"));
-	initTaskManager();
 	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                  [DONE]\r\n"));
+	#if KERNEL_CLI_MODULE == 1
+		kernel_initCLI();
+	#endif
 	while(1){
 		wdt_reset();
 		uint8_t taskReturnCode = kernel_taskManager();
@@ -515,14 +515,16 @@ inline static void kernel_taskService()
 	e_time++;
 }
 
-ISR(TIMER1_COMPA_vect)
+ISR(HAL_TIMER_INTERRUPT_vect)
 {
 	hal_setBit_m(kflags, KFLAG_TIMER_ISR);
 	hal_disableInterrupts();
 	
 	kernel_taskService();
-	#ifndef USE_EXTERNAL_TIMER
-		kernel_timerService();
+	#ifndef USE_EXTERNAL_TIMER_ISR
+		#if KERNEL_TIMER_MODULE == 1
+			kernel_timerService();
+		#endif
 	#endif
 	
 	hal_enableInterrupts();

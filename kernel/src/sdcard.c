@@ -6,12 +6,13 @@
  */ 
 
 #include "../kernel.h"
-#include "../drivers.h"
+#include "../../pff3a/pff.h"
 #include <stdlib.h>
 
 void sd_flush();
 
 #if KERNEL_SD_MODULE == 1
+	FATFS fs;
 	static char sd_buffer0[512];
 	static char sd_buffer1[256];
 	static uint16_t sd_index = 0;

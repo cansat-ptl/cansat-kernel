@@ -12,8 +12,12 @@
 #ifndef KERNELconfig
 #define KERNELconfig
 
-	//#define KERNEL_USE_TIMER_0
-	#define KERNEL_USE_TIMER_1A
+	#define KERNEL_SD_MODULE 0
+	#define KERNEL_WDT_MODULE 1
+	#define KERNEL_UTIL_MODULE 0
+	#define KERNEL_DEBUG_MODULE 1
+	#define KERNEL_CLI_MODULE 0
+	#define KERNEL_TIMER_MODULE 0
 
 	#define MAX_TIMER_COUNT 1
 	#define MAX_TASK_QUEUE_SIZE 4
@@ -34,13 +38,15 @@
 	/* 6 & 7 - external clock (datasheet)       */
 	
 	#define FORCE_LOWERPRIO_THRESHOLD 10
-
-	#define KERNEL_SD_MODULE 0
-	#define KERNEL_WDT_MODULE 1
-	#define KERNEL_UTIL_MODULE 0
-	#define KERNEL_DEBUG_MODULE 1
-	#define KERNEL_CLI_MODULE 0
-	#define KERNEL_TIMER_MODULE 1
+	
+	//#define hal_uart_init(ubrr) uart0_init(ubrr)
+	//#define hal_uart_putc(c) uart0_putc(c)
+	//#define hal_uart_puts(s) uart0_puts(s)
+	//#define hal_uart_enableInterruptsRX() rx0_enableInterrupts()
+	//#define hal_uart_disableInterruptsRX() rx0_disableInterrupts()
+	
+	#define HAL_USE_TIMER0
+	//#define HAL_USE_TIMER1A
 	
 	#define UART_LOGGING 1
 	

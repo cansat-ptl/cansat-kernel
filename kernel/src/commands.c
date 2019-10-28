@@ -5,7 +5,7 @@
  *  Author: WorldSkills-2019
  */ 
 #include "../kernel.h"
-#include "../drivers.h"
+#include "../hal.h"
 
 #if KERNEL_CLI_MODULE == 1
 
@@ -21,7 +21,7 @@ static uint8_t registeredCmds = 0;
 static void kernel_clearRecvBuffer(){
 	for(int i = 0; i < RX0_BUFFER_SIZE; i++) recvBuffer[i] = 0;
 	recvBuffer_i = 0;
-	rx0_enableInterrupt();
+	hal_uart_enableInterruptsRX();
 }
 static int kernel_processCommand()
 {
@@ -192,7 +192,7 @@ static void reboot()
 
 static void datetime()
 {
-	debug_logMessage(PGM_ON, L_NONE, PSTR("Current time: %02d.%02d.20%02d %02d:%02d:%02d UTC\r\n"), GPS.day, GPS.month, GPS.year, GPS.hour, GPS.minute, GPS.second);
+	//debug_logMessage(PGM_ON, L_NONE, PSTR("Current time: %02d.%02d.20%02d %02d:%02d:%02d UTC\r\n"), GPS.day, GPS.month, GPS.year, GPS.hour, GPS.minute, GPS.second);
 }
 
 static void clear()
@@ -311,7 +311,7 @@ void kernel_initCLI()
 	debug_logMessage(PGM_ON, L_NONE, PSTR("|  Run 'config' to change the device's settings.                  |\r\n"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR("+-----------------------------------------------------------------+\r\n"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR("\r\nroot@cansat:< "));
-	rx0_enableInterrupt();
+	hal_uart_enableInterruptsRX();
 }
 
 ISR(USART0_RX_vect)
@@ -328,7 +328,7 @@ ISR(USART0_RX_vect)
 	}
 	if(data == '\r' || data == '\n' || data == ';'){
 		recvBuffer[recvBuffer_i-1] = '\0';
-		rx0_disableInterrupt();
+		hal_uart_disableInterruptsRX();
 		//kernel_processCommand();
 		kernel_addCall(kernel_processCommand, KPRIO_LOW);
 	}
