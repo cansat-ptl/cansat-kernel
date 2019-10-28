@@ -100,7 +100,7 @@ static void config()
 			uint8_t a = 0;
 			switch(activeArgument){
 				case '\0':
-					debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Unknown argument: %s\r\n"), token);
+					debug_logMessage(PGM_PUTS, L_NONE, PSTR("cli: Unknown argument: %s\r\n"), token);
 					return;
 				break;
 				case 'a':

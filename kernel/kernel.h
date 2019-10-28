@@ -79,6 +79,8 @@ void kernel_stopTimer() __attribute__ ((section (".kernel")));
 void kernel_startTimer() __attribute__ ((section (".kernel")));
 void kernel_setupTimer() __attribute__ ((section (".kernel")));
 
+void kernel_handleError(uint8_t error) __attribute__ ((section (".kernel")));
+
 #ifdef KERNEL_TIMER_MODULE
 	uint8_t kernel_setTimer(timerISR t_pointer, uint32_t t_delay) __attribute__ ((section (".kernel")));
 	uint8_t kernel_removeTimer(timerISR t_pointer) __attribute__ ((section (".kernel")));
@@ -102,7 +104,6 @@ void kernel_setupTimer() __attribute__ ((section (".kernel")));
 #ifdef KERNEL_UTIL_MODULE
 	#define util_getArrayLength_m(arr) ((int)(sizeof(arr) / sizeof(arr)[0]))
 	uint8_t util_strCompare(char * a, char * b, uint8_t len) __attribute__ ((section (".kernel")));
-	void util_displayError(uint8_t error);
 #endif
 
 //#ifdef KERNEL_CLI_MODULE

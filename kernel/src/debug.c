@@ -104,8 +104,8 @@ void debug_sendMessageSD_p(char* buffer, uint8_t level, const char * format, va_
 
 void debug_puts(uint8_t level, const char * format)
 {
-	char * levelptr = (char*)pgm_read_word(&(levels[level]));
 	#if KERNEL_DEBUG_MODULE == 1
+	char * levelptr = (char*)pgm_read_word(&(levels[level]));
 		while(pgm_read_byte(levelptr) != 0x00)
 			hal_uart_putc(pgm_read_byte(levelptr++));
 		while(pgm_read_byte(format) != 0x00)
@@ -117,8 +117,8 @@ void debug_puts(uint8_t level, const char * format)
 
 void debug_putsSD(uint8_t level, const char * format)
 {
-	char * levelptr = (char*)pgm_read_word(&(levels[level]));
 	#if KERNEL_DEBUG_MODULE == 1
+	char * levelptr = (char*)pgm_read_word(&(levels[level]));
 		while(pgm_read_byte(levelptr) != 0x00)
 			sd_putc(pgm_read_byte(levelptr++));
 		while(pgm_read_byte(format) != 0x00)

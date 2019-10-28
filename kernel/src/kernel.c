@@ -26,8 +26,6 @@ static volatile uint8_t taskIndex = 0; //Index of the last task in queue
 #endif
 static volatile struct taskStruct taskQueue[MAX_TASK_QUEUE_SIZE];
 
-static char const PROGMEM _MODULE_SIGNATURE[] = "Kernel";
-
 int idle(){
 	hal_nop();
 	return 0;
@@ -114,10 +112,7 @@ static inline void kernel_resetTaskByPosition(uint8_t position){
 }
 
 inline uint8_t kernel_addCall(task t_ptr, uint8_t t_priority)
-{	
-	if(kernel_checkFlag(KFLAG_DEBUG) && VERBOSE)
-		debug_logMessage(PGM_PUTS, L_INFO, (char *)PSTR("kernel: Added call to queue\r\n"));
-		
+{		
 	uint8_t sreg = hal_statusReg;
 	hal_disableInterrupts();
 		
@@ -150,9 +145,6 @@ inline uint8_t kernel_addCall(task t_ptr, uint8_t t_priority)
 
 uint8_t kernel_addTask(uint8_t taskType, task t_ptr, uint16_t t_delay, uint8_t t_priority, uint8_t startupState)
 {
-	if(kernel_checkFlag(KFLAG_DEBUG) && VERBOSE)
-		debug_logMessage(PGM_PUTS, L_INFO, (char *)PSTR("kernel: Added timed task to queue\r\n"));
-		
 	uint8_t sreg = hal_statusReg;
 	hal_disableInterrupts();
 		
@@ -272,8 +264,10 @@ uint8_t kernel_removeTaskByPtr(task t_pointer)
 
 void kernel_clearCallQueue(uint8_t t_priority)
 {
-	if(kernel_checkFlag(KFLAG_DEBUG) && VERBOSE)
-		debug_logMessage(PGM_PUTS, L_WARN, (char *)PSTR("kernel: Call queue cleared\r\n"));
+	#if LOGGING == 1
+		if(kernel_checkFlag(KFLAG_DEBUG) && VERBOSE)
+			debug_logMessage(PGM_PUTS, L_WARN, (char *)PSTR("kernel: Call queue cleared\r\n"));
+	#endif
 	uint8_t sreg = hal_statusReg;
 	hal_disableInterrupts();
 	
@@ -385,12 +379,15 @@ inline static uint8_t kernel_taskManager()
 
 static uint8_t kernel()
 {
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                        [DONE]\r\n"));
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Starting task manager"));
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                  [DONE]\r\n"));
+	#if LOGGING == 1
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                        [DONE]\r\n"));
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Starting task manager"));
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                  [DONE]\r\n"));
+	#endif
 	#if KERNEL_CLI_MODULE == 1
 		kernel_initCLI();
 	#endif
+	kernel_setFlag(KFLAG_INIT, 0);
 	while(1){
 		wdt_reset();
 		uint8_t taskReturnCode = kernel_taskManager();
@@ -422,7 +419,9 @@ void kernel_stopTimer()
 void kernel_setupTimer()
 {
 	hal_setupSystemTimer();
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                         [DONE]\r\n"));
+	#if LOGGING == 1
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                         [DONE]\r\n"));
+	#endif
 	kernel_setFlag(KFLAG_TIMER_SET, 1);
 }
 
@@ -432,44 +431,56 @@ uint8_t kernelInit()
 	kernel_setFlag(KFLAG_INIT, 1);
 	kernel_setFlag(KFLAG_TIMER_SET, 0);
 	kernel_setFlag(KFLAG_TIMER_EN, 0);
-	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("\r\n[INIT]kernel: Starting up CanSat kernel v%s\r\n\r\n"), KERNEL_VER);
+	#if LOGGING == 1
+		debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("\r\n[INIT]kernel: Starting up CanSat kernel v%s\r\n\r\n"), KERNEL_VER);
+	#endif
 	
 	wdt_reset();
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Setting up PRIORITY_HIGH queue"));
+	#if LOGGING == 1
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Setting up PRIORITY_HIGH queue"));
+	#endif
 	kernel_clearCallQueue(0);
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("         [DONE]\r\n"));
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Setting up PRIORITY_NORM queue"));
+	#if LOGGING == 1
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("         [DONE]\r\n"));
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Setting up PRIORITY_NORM queue"));
+	#endif
 	kernel_clearCallQueue(1);
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("         [DONE]\r\n"));
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Setting up PRIORITY_LOW queue"));
+	#if LOGGING == 1
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("         [DONE]\r\n"));
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Setting up PRIORITY_LOW queue"));
+	#endif
 	kernel_clearCallQueue(2);
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("          [DONE]\r\n"));
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Setting up task queue"));
+	#if LOGGING == 1
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("          [DONE]\r\n"));
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Setting up task queue"));
+	#endif
 	kernel_clearTaskQueue();
 	wdt_reset();
-	
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                  [DONE]\r\n"));
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("\r\n----------------------Memory usage----------------------\r\n"));
-	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: HIGHPRIO queue size:             %d\r\n"), MAX_HIGHPRIO_CALL_QUEUE_SIZE);
-	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: NORMPRIO queue size:             %d\r\n"), MAX_NORMPRIO_CALL_QUEUE_SIZE);
-	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: LOWPRIO queue size:              %d\r\n"), MAX_LOWPRIO_CALL_QUEUE_SIZE);
-	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: Task queue size:                 %d\r\n"), MAX_TASK_QUEUE_SIZE);
-	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: HIGHPRIO queue memory usage:     %d bytes\r\n"), MAX_HIGHPRIO_CALL_QUEUE_SIZE * sizeof(void*));
-	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: NORMPRIO queue memory usage:     %d bytes\r\n"), MAX_NORMPRIO_CALL_QUEUE_SIZE * sizeof(void*));
-	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: LOWPRIO queue memory usage:      %d bytes\r\n"), MAX_LOWPRIO_CALL_QUEUE_SIZE * sizeof(void*));
-	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: Task queue memory usage:         %d bytes\r\n"), MAX_TASK_QUEUE_SIZE * sizeof(taskQueue[0]));
-	debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: Total Task Manager memory usage: %d bytes\r\n"), MAX_TASK_QUEUE_SIZE * sizeof(taskQueue[0]) +\
-																												  MAX_HIGHPRIO_CALL_QUEUE_SIZE * sizeof(void*) +\
-																												  MAX_NORMPRIO_CALL_QUEUE_SIZE * sizeof(void*) +\
-																												  MAX_LOWPRIO_CALL_QUEUE_SIZE * sizeof(void*));
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("--------------------------------------------------------\r\n\r\n"));
+	#if LOGGING == 1
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                  [DONE]\r\n"));
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("\r\n----------------------Memory usage----------------------\r\n"));
+		debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: HIGHPRIO queue size:             %d\r\n"), MAX_HIGHPRIO_CALL_QUEUE_SIZE);
+		debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: NORMPRIO queue size:             %d\r\n"), MAX_NORMPRIO_CALL_QUEUE_SIZE);
+		debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: LOWPRIO queue size:              %d\r\n"), MAX_LOWPRIO_CALL_QUEUE_SIZE);
+		debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: Task queue size:                 %d\r\n"), MAX_TASK_QUEUE_SIZE);
+		debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: HIGHPRIO queue memory usage:     %d bytes\r\n"), MAX_HIGHPRIO_CALL_QUEUE_SIZE * sizeof(void*));
+		debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: NORMPRIO queue memory usage:     %d bytes\r\n"), MAX_NORMPRIO_CALL_QUEUE_SIZE * sizeof(void*));
+		debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: LOWPRIO queue memory usage:      %d bytes\r\n"), MAX_LOWPRIO_CALL_QUEUE_SIZE * sizeof(void*));
+		debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: Task queue memory usage:         %d bytes\r\n"), MAX_TASK_QUEUE_SIZE * sizeof(taskQueue[0]));
+		debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("[INIT]kernel: Total Task Manager memory usage: %d bytes\r\n"), MAX_TASK_QUEUE_SIZE * sizeof(taskQueue[0]) +\
+		MAX_HIGHPRIO_CALL_QUEUE_SIZE * sizeof(void*) +\
+		MAX_NORMPRIO_CALL_QUEUE_SIZE * sizeof(void*) +\
+		MAX_LOWPRIO_CALL_QUEUE_SIZE * sizeof(void*));
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("--------------------------------------------------------\r\n\r\n"));
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Starting timer"));
+	#endif
 	wdt_reset();
-	
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Starting timer"));
 	kernel_setupTimer();
 	kernel_startTimer();
 	kernel_setFlag(KFLAG_TIMER_EN, 1);
-	debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Starting kernel"));
+	#if LOGGING == 1
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Starting kernel"));
+	#endif
 	kernel();
 	
 	return 0;

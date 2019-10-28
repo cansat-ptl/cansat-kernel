@@ -12,22 +12,25 @@
 #ifndef KERNELconfig
 #define KERNELconfig
 
+	//Kernel modules - set to 0 to disable
 	#define KERNEL_SD_MODULE 0
 	#define KERNEL_WDT_MODULE 1
 	#define KERNEL_UTIL_MODULE 0
 	#define KERNEL_DEBUG_MODULE 1
-	#define KERNEL_CLI_MODULE 0
-	#define KERNEL_TIMER_MODULE 0
+	#define KERNEL_CLI_MODULE 1
+	#define KERNEL_TIMER_MODULE 1
 
-	#define MAX_TIMER_COUNT 1
+	//Task manager settings
 	#define MAX_TASK_QUEUE_SIZE 4
 	#define MAX_HIGHPRIO_CALL_QUEUE_SIZE 8
 	#define MAX_NORMPRIO_CALL_QUEUE_SIZE 0
-	#define MAX_LOWPRIO_CALL_QUEUE_SIZE 0
-
+	#define MAX_LOWPRIO_CALL_QUEUE_SIZE 2
+	
+	//Timer settings
+	#define MAX_TIMER_COUNT 1
 	#define KERNEL_TIMER_PRESCALER 3
 	#define TICKRATE_MS 1
-
+	
 	/*             Prescaler values             */
 	/* 0 - timer disabled                       */
 	/* 1 - no prescaling (F_TIMER = F_CPU)      */
@@ -37,24 +40,30 @@
 	/* 5 - F_CPU / 1024                         */
 	/* 6 & 7 - external clock (datasheet)       */
 	
-	#define FORCE_LOWERPRIO_THRESHOLD 10
+	//Debug logging options
+	#define LOGGING 1
+	#define VERBOSE 0
+	#define PROFILING 0
 	
+	//CLI options
+	#define RX0_BUFFER_SIZE 64
+	#define MAX_CMD_WORD_SIZE 16
+	
+	//Error handlers
+	#define kErrHandler_queueOverflow()
+	#define kErrHandler_wdtReset()
+	#define kErrHandler_bodReset()
+	#define kErrHandler_devFail()
+
+	//HAL uart settings - comment these lines to use built-in uart driver, or specify your own uart functions
 	//#define hal_uart_init(ubrr) uart0_init(ubrr)
 	//#define hal_uart_putc(c) uart0_putc(c)
 	//#define hal_uart_puts(s) uart0_puts(s)
 	//#define hal_uart_enableInterruptsRX() rx0_enableInterrupts()
 	//#define hal_uart_disableInterruptsRX() rx0_disableInterrupts()
 	
+	//HAL timer selection - uncomment the timer to select it
 	#define HAL_USE_TIMER0
 	//#define HAL_USE_TIMER1A
-	
-	#define UART_LOGGING 1
-	
-	#define RX0_BUFFER_SIZE 64
-	#define MAX_CMD_WORD_SIZE 16
-
-	#define VERBOSE 0
-	#define PROFILING 0
-	
 #endif
 #endif /* KERNEL_CONFIG_H_ */
