@@ -120,9 +120,9 @@ inline uint8_t kernel_addCall(task t_ptr, uint8_t t_priority)
 	if(maxsize == 0) return 0;
 
 	if(callIndex[t_priority] < maxsize){
-		callIndex[t_priority]++;
 		volatile task* ptr = kernel_getCallQueuePointer(t_priority);
 		(ptr)[callIndex[t_priority]] = t_ptr;
+		callIndex[t_priority]++;
 		
 		hal_enableInterrupts();
 		hal_statusReg = sreg;
@@ -130,7 +130,7 @@ inline uint8_t kernel_addCall(task t_ptr, uint8_t t_priority)
 	}
 	else {
 		#if KERNEL_UTIL_MODULE == 1
-			util_displayError(ERR_QUEUE_OVERFLOW);
+			kernel_handleError(ERR_QUEUE_OVERFLOW);
 		#endif
 		kernel_clearCallQueue(0);
 		kernel_clearCallQueue(1);
@@ -162,13 +162,13 @@ uint8_t kernel_addTask(uint8_t taskType, task t_ptr, uint16_t t_delay, uint8_t t
 		}
 	}
 	if(taskIndex < MAX_TASK_QUEUE_SIZE){
-		taskIndex++;
 		taskQueue[taskIndex].pointer = t_ptr;
 		taskQueue[taskIndex].delay = t_delay;
 		taskQueue[taskIndex].priority = t_priority;
 		taskQueue[taskIndex].state = startupState;
 		if(taskType == KTASK_REPEATED) taskQueue[taskIndex].repeatPeriod = t_delay;
 		else taskQueue[taskIndex].repeatPeriod = 0;
+		taskIndex++;
 		
 		hal_enableInterrupts();
 		hal_statusReg = sreg;
@@ -176,7 +176,7 @@ uint8_t kernel_addTask(uint8_t taskType, task t_ptr, uint16_t t_delay, uint8_t t
 	}
 	else {
 		#if KERNEL_UTIL_MODULE == 1
-			util_displayError(ERR_QUEUE_OVERFLOW);
+			kernel_handleError(ERR_QUEUE_OVERFLOW);
 		#endif
 		kernel_clearCallQueue(0);
 		kernel_clearCallQueue(1);
@@ -392,7 +392,7 @@ static uint8_t kernel()
 		wdt_reset();
 		uint8_t taskReturnCode = kernel_taskManager();
 		#if KERNEL_UTIL_MODULE == 1
-			if(taskReturnCode != 0) util_displayError(taskReturnCode);
+			if(taskReturnCode != 0) kernel_handleError(taskReturnCode);
 		#endif
 		hal_switchBit(&LED_KRN_PORT, LED_KRN);
 		hal_enableInterrupts();
@@ -490,14 +490,14 @@ void kernel_checkMCUCSR()
 {
 	if(hal_checkBit_m(mcucsr_mirror, WDRF)){
 		#if KERNEL_UTIL_MODULE == 1
-			util_displayError(ERR_WDT_RESET);
+			kernel_handleError(ERR_WDT_RESET);
 		#endif
 		hal_setBit_m(kflags, WDRF);
 		return;
 	}
 	if(hal_checkBit_m(mcucsr_mirror, BORF)){
 		#if KERNEL_UTIL_MODULE == 1
-			util_displayError(ERR_BOD_RESET);
+			kernel_handleError(ERR_BOD_RESET);
 		#endif
 		hal_setBit_m(kflags, BORF);
 	}
