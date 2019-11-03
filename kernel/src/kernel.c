@@ -150,10 +150,10 @@ uint8_t kernel_addTask(uint8_t taskType, task t_ptr, uint16_t t_delay, uint8_t t
 		
 	for(int i = 0; i <= taskIndex; i++){
 		if(taskQueue[i].pointer == t_ptr){
-			taskQueue[i].repeatPeriod = t_delay;
+			taskQueue[i].repeatPeriod = t_delay - 1;
 			taskQueue[i].priority = t_priority;
 			taskQueue[i].state = startupState;
-			if(taskType == KTASK_REPEATED) taskQueue[i].repeatPeriod = t_delay;
+			if(taskType == KTASK_REPEATED) taskQueue[i].repeatPeriod = t_delay - 1;
 			else taskQueue[i].repeatPeriod = 0;
 			
 			hal_enableInterrupts();
@@ -163,10 +163,10 @@ uint8_t kernel_addTask(uint8_t taskType, task t_ptr, uint16_t t_delay, uint8_t t
 	}
 	if(taskIndex < MAX_TASK_QUEUE_SIZE){
 		taskQueue[taskIndex].pointer = t_ptr;
-		taskQueue[taskIndex].delay = t_delay;
+		taskQueue[taskIndex].delay = t_delay - 1;
 		taskQueue[taskIndex].priority = t_priority;
 		taskQueue[taskIndex].state = startupState;
-		if(taskType == KTASK_REPEATED) taskQueue[taskIndex].repeatPeriod = t_delay;
+		if(taskType == KTASK_REPEATED) taskQueue[taskIndex].repeatPeriod = t_delay - 1;
 		else taskQueue[taskIndex].repeatPeriod = 0;
 		taskIndex++;
 		
@@ -323,7 +323,7 @@ uint8_t kernel_setTaskState(task t_pointer, uint8_t state)
 inline static uint8_t kernel_taskManager()
 {
 	#if MAX_HIGHPRIO_CALL_QUEUE_SIZE != 0
-	if((callQueueP0[0] != idle || callQueueP0[1] != idle)){
+	if((callQueueP0[0] != idle)){
 		#if PROFILING == 1
 			uint64_t startTime = kernel_getUptime();
 		#endif
@@ -340,7 +340,7 @@ inline static uint8_t kernel_taskManager()
 	}
 	#endif
 	#if MAX_NORMPRIO_CALL_QUEUE_SIZE != 0
-	else if((callQueueP1[0] != idle || callQueueP1[1] != idle)){	
+	else if((callQueueP1[0] != idle)){	
 		#if PROFILING == 1
 			uint64_t startTime = kernel_getUptime();
 		#endif
@@ -357,7 +357,7 @@ inline static uint8_t kernel_taskManager()
 	}
 	#endif
 	#if MAX_LOWPRIO_CALL_QUEUE_SIZE != 0
-	else if(callQueueP2[0] != idle || callQueueP2[1] != idle){		
+	else if(callQueueP2[0] != idle){		
 		#if PROFILING == 1
 			uint64_t startTime = kernel_getUptime();
 		#endif
@@ -454,7 +454,6 @@ uint8_t kernelInit()
 		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("          [DONE]\r\n"));
 		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Setting up task queue"));
 	#endif
-	kernel_clearTaskQueue();
 	wdt_reset();
 	#if LOGGING == 1
 		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                  [DONE]\r\n"));
@@ -482,7 +481,6 @@ uint8_t kernelInit()
 		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Starting kernel"));
 	#endif
 	kernel();
-	
 	return 0;
 }
 

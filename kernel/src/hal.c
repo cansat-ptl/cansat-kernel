@@ -139,7 +139,7 @@ void hal_setupTimer0(uint8_t prescaler)
 {
 	uint8_t sreg = hal_statusReg;
 	hal_disableInterrupts();
-	TCCR0 |= (1 << WGM12)|(prescaler << CS10); // prescaler 64 cs11 & cs10 = 1
+	TCCR0 |= (prescaler << CS00); // prescaler 64 cs11 & cs10 = 1
 	TCNT0 = 0;
 	OCR0 = 125;
 	hal_enableInterrupts();
