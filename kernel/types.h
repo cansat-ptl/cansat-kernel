@@ -12,14 +12,14 @@
 
 #define CMD_MAX_WORD_SIZE 16
 
-typedef char cmdWord[CMD_MAX_WORD_SIZE];
-typedef int (*task)(void);
-typedef void (*timerISR)(void);
-typedef void (*cmdHandler)();
+typedef char kCmdWord_t[CMD_MAX_WORD_SIZE];
+typedef int (*kTask)(void);
+typedef void (*kTimerISR)(void);
+typedef void (*kCmdHandler)();
 typedef uint8_t byte;
 
-struct taskStruct {
-	task pointer;
+struct kTaskStruct_t {
+	kTask pointer;
 	uint16_t delay;
 	uint16_t repeatPeriod;
 	uint8_t priority;
@@ -28,15 +28,15 @@ struct taskStruct {
 	uint8_t argMemSize;
 };
 
-struct timerStruct {
-	timerISR tsrPointer;
+struct kTimerStruct_t {
+	kTimerISR tsrPointer;
 	uint32_t period;
 	uint32_t repeatPeriod;
 };
 
-struct commandStruct {
-	cmdWord keyword;
-	cmdHandler handler;
+struct kCommandStruct_t {
+	kCmdWord_t keyword;
+	kCmdHandler handler;
 	uint8_t length;
 };
 

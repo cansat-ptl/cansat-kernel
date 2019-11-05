@@ -7,10 +7,10 @@
 #include "../kernel.h"
 
 #if KERNEL_TIMER_MODULE == 1
-static volatile struct timerStruct timerQueue[MAX_TIMER_COUNT];
+static volatile struct kTimerStruct_t timerQueue[MAX_TIMER_COUNT];
 static volatile uint8_t timerIndex = 0;
 
-uint8_t kernel_setTimer(timerISR t_pointer, uint32_t t_delay)
+uint8_t kernel_setTimer(kTimerISR t_pointer, uint32_t t_delay)
 {
 	if(!kernel_checkFlag(KFLAG_TIMER_EN)) return 2;
 		
@@ -44,7 +44,7 @@ uint8_t kernel_setTimer(timerISR t_pointer, uint32_t t_delay)
 	}
 }
 
-uint8_t kernel_removeTimer(timerISR t_pointer)
+uint8_t kernel_removeTimer(kTimerISR t_pointer)
 {
 	if(!kernel_checkFlag(KFLAG_TIMER_EN)) return 2;
 	

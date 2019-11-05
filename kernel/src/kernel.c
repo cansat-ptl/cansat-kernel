@@ -16,15 +16,15 @@ extern uint8_t mcucsr_mirror;
 static uint8_t callIndex[3] = {0, 0, 0};
 static volatile uint8_t taskIndex = 0; //Index of the last task in queue
 #if MAX_HIGHPRIO_CALL_QUEUE_SIZE != 0
-	static volatile task callQueueP0[MAX_HIGHPRIO_CALL_QUEUE_SIZE];
+	static volatile kTask callQueueP0[MAX_HIGHPRIO_CALL_QUEUE_SIZE];
 #endif
 #if MAX_NORMPRIO_CALL_QUEUE_SIZE != 0
-	static volatile task callQueueP1[MAX_NORMPRIO_CALL_QUEUE_SIZE];
+	static volatile kTask callQueueP1[MAX_NORMPRIO_CALL_QUEUE_SIZE];
 #endif
 #if MAX_LOWPRIO_CALL_QUEUE_SIZE != 0
-	static volatile task callQueueP2[MAX_LOWPRIO_CALL_QUEUE_SIZE]; //TODO: variable number of priorities (might be hard to implement)
+	static volatile kTask callQueueP2[MAX_LOWPRIO_CALL_QUEUE_SIZE]; //TODO: variable number of priorities (might be hard to implement)
 #endif
-static volatile struct taskStruct taskQueue[MAX_TASK_QUEUE_SIZE];
+static volatile struct kTaskStruct_t taskQueue[MAX_TASK_QUEUE_SIZE];
 
 int idle(){
 	hal_nop();
@@ -57,7 +57,7 @@ uint64_t kernel_getUptime()
 	return e_time;
 }
 
-static inline volatile task* kernel_getCallQueuePointer(uint8_t t_priority){
+static inline volatile kTask* kernel_getCallQueuePointer(uint8_t t_priority){
 	switch(t_priority){
 		case KPRIO_HIGH:
 			#if MAX_HIGHPRIO_CALL_QUEUE_SIZE != 0
@@ -111,7 +111,7 @@ static inline void kernel_resetTaskByPosition(uint8_t position){
 	taskQueue[position].state = KSTATE_ACTIVE;
 }
 
-inline uint8_t kernel_addCall(task t_ptr, uint8_t t_priority)
+inline uint8_t kernel_addCall(kTask t_ptr, uint8_t t_priority)
 {		
 	uint8_t sreg = hal_statusReg;
 	hal_disableInterrupts();
@@ -120,7 +120,7 @@ inline uint8_t kernel_addCall(task t_ptr, uint8_t t_priority)
 	if(maxsize == 0) return 0;
 
 	if(callIndex[t_priority] < maxsize){
-		volatile task* ptr = kernel_getCallQueuePointer(t_priority);
+		volatile kTask* ptr = kernel_getCallQueuePointer(t_priority);
 		(ptr)[callIndex[t_priority]] = t_ptr;
 		callIndex[t_priority]++;
 		
@@ -143,7 +143,7 @@ inline uint8_t kernel_addCall(task t_ptr, uint8_t t_priority)
 	}
 }
 
-uint8_t kernel_addTask(uint8_t taskType, task t_ptr, uint16_t t_delay, uint8_t t_priority, uint8_t startupState)
+uint8_t kernel_addTask(uint8_t taskType, kTask t_ptr, uint16_t t_delay, uint8_t t_priority, uint8_t startupState)
 {
 	uint8_t sreg = hal_statusReg;
 	hal_disableInterrupts();
@@ -196,7 +196,7 @@ inline uint8_t kernel_removeCall(uint8_t t_priority)
 		
 	uint8_t maxsize = kernel_getMaxQueueSize(t_priority);
 	if(maxsize == 0) return 0;
-	volatile task* ptr = kernel_getCallQueuePointer(t_priority);
+	volatile kTask* ptr = kernel_getCallQueuePointer(t_priority);
 	if(ptr == NULL) return 0;
 	
 	if(callIndex[t_priority] != 0){
@@ -232,7 +232,7 @@ inline uint8_t kernel_removeTask(uint8_t position)
 	return 0;
 }
 
-uint8_t kernel_removeTaskByPtr(task t_pointer)
+uint8_t kernel_removeTaskByPtr(kTask t_pointer)
 {
 	uint8_t position;
 	uint8_t sreg = hal_statusReg;
@@ -273,7 +273,7 @@ void kernel_clearCallQueue(uint8_t t_priority)
 	
 	uint8_t maxsize = kernel_getMaxQueueSize(t_priority);
 	if(maxsize == 0) return;	
-	volatile task* ptr = kernel_getCallQueuePointer(t_priority);
+	volatile kTask* ptr = kernel_getCallQueuePointer(t_priority);
 	if(ptr == NULL) return;
 	
 	for(int i = 0; i < maxsize; i++){
@@ -302,7 +302,7 @@ void kernel_clearTaskQueue()
 	hal_statusReg = sreg;
 }
 
-uint8_t kernel_setTaskState(task t_pointer, uint8_t state)
+uint8_t kernel_setTaskState(kTask t_pointer, uint8_t state)
 {
 	uint8_t sreg = hal_statusReg;
 	hal_disableInterrupts();

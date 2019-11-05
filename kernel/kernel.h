@@ -65,11 +65,11 @@ void kernel_setFlag(uint8_t flag, uint8_t value) __attribute__ ((section (".kern
 uint8_t kernel_checkFlag(uint8_t flag) __attribute__ ((section (".kernel")));
 uint64_t kernel_getUptime() __attribute__ ((section (".kernel")));
 
-uint8_t kernel_addCall(task t_ptr, uint8_t t_priority) __attribute__ ((section (".kernel"))); 
-uint8_t kernel_addTask(uint8_t taskType, task t_ptr, uint16_t t_delay, uint8_t t_priority, uint8_t startupState) __attribute__ ((section (".kernel")));
+uint8_t kernel_addCall(kTask t_ptr, uint8_t t_priority) __attribute__ ((section (".kernel"))); 
+uint8_t kernel_addTask(uint8_t taskType, kTask t_ptr, uint16_t t_delay, uint8_t t_priority, uint8_t startupState) __attribute__ ((section (".kernel")));
 uint8_t kernel_removeCall(uint8_t t_priority) __attribute__ ((section (".kernel")));
 uint8_t kernel_removeTask(uint8_t position) __attribute__ ((section (".kernel")));
-uint8_t kernel_setTaskState(task t_pointer, uint8_t state) __attribute__ ((section (".kernel")));
+uint8_t kernel_setTaskState(kTask t_pointer, uint8_t state) __attribute__ ((section (".kernel")));
 void kernel_clearTaskQueue() __attribute__ ((section (".kernel")));
 void kernel_clearCallQueue(uint8_t t_priority) __attribute__ ((section (".kernel")));
 void kernel_checkMCUCSR() __attribute__ ((section (".kernel")));
@@ -82,8 +82,8 @@ void kernel_setupTimer() __attribute__ ((section (".kernel")));
 void kernel_handleError(uint8_t error) __attribute__ ((section (".kernel")));
 
 #ifdef KERNEL_TIMER_MODULE
-	uint8_t kernel_setTimer(timerISR t_pointer, uint32_t t_delay) __attribute__ ((section (".kernel")));
-	uint8_t kernel_removeTimer(timerISR t_pointer) __attribute__ ((section (".kernel")));
+	uint8_t kernel_setTimer(kTimerISR t_pointer, uint32_t t_delay) __attribute__ ((section (".kernel")));
+	uint8_t kernel_removeTimer(kTimerISR t_pointer) __attribute__ ((section (".kernel")));
 	void kernel_timerService() __attribute__ ((section (".kernel")));
 #endif
 
@@ -110,7 +110,7 @@ void kernel_handleError(uint8_t error) __attribute__ ((section (".kernel")));
 	#define ERR_EMPTY_STRING 20
 	#define ERR_COMMAND_NOT_FOUND 21
 	void kernel_initCLI() __attribute__ ((section (".kernel")));
-	void kernel_registerCommand(const char * c_keyword, cmdHandler c_ptr) __attribute__ ((section (".kernel")));
+	void kernel_registerCommand(const char * c_keyword, kCmdHandler c_ptr) __attribute__ ((section (".kernel")));
 //#endif
 	
 

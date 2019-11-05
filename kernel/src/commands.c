@@ -15,7 +15,7 @@
 
 volatile static char recvBuffer[RX0_BUFFER_SIZE];
 volatile static uint8_t recvBuffer_i = 0;
-static struct commandStruct commands[CMD_COMMAND_AMOUNT];
+static struct kCommandStruct_t commands[CMD_COMMAND_AMOUNT];
 static uint8_t registeredCmds = 0;
 
 static void kernel_clearRecvBuffer(){
@@ -61,7 +61,7 @@ static int kernel_processCommand()
 	return ERR_COMMAND_NOT_FOUND;
 }
 
-void kernel_registerCommand(const char * c_keyword, cmdHandler c_ptr)
+void kernel_registerCommand(const char * c_keyword, kCmdHandler c_ptr)
 {
 	if(registeredCmds < CMD_COMMAND_AMOUNT+1){
 		debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Registered command %s, handler at 0x%X\r\n"), c_keyword, (int)c_ptr);
