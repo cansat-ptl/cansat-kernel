@@ -24,8 +24,6 @@ struct kTaskStruct_t {
 	uint16_t repeatPeriod;
 	uint8_t priority;
 	uint8_t state;
-	void * argMemPtr;
-	uint8_t argMemSize;
 };
 
 struct kTimerStruct_t {
