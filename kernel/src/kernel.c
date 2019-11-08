@@ -111,11 +111,23 @@ static inline void kernel_resetTaskByPosition(uint8_t position){
 	kTaskQueue[position].state = KSTATE_ACTIVE;
 }
 
-inline uint8_t kernel_addCall(kTask t_ptr, uint8_t t_priority)
-{		
+static inline void kernel_addCall_i(kTask t_ptr, uint8_t t_priority)
+{			
+	uint8_t maxsize = kernel_getMaxQueueSize(t_priority);
+
+	if(kCallIndex[t_priority] < maxsize){
+		volatile kTask* ptr = kernel_getCallQueuePointer(t_priority);
+		
+		(ptr)[kCallIndex[t_priority]] = t_ptr;
+		kCallIndex[t_priority]++;
+	}
+}
+
+uint8_t kernel_addCall(kTask t_ptr, uint8_t t_priority)
+{
 	uint8_t sreg = hal_statusReg;
 	hal_disableInterrupts();
-		
+	
 	uint8_t maxsize = kernel_getMaxQueueSize(t_priority);
 	if(maxsize == 0) return 1;
 
@@ -130,7 +142,7 @@ inline uint8_t kernel_addCall(kTask t_ptr, uint8_t t_priority)
 		hal_statusReg = sreg;
 		return 0;
 	}
-	else {	
+	else {
 		hal_enableInterrupts();
 		hal_statusReg = sreg;
 		return ERR_QUEUE_OVERFLOW;
@@ -478,7 +490,7 @@ inline static void kernel_taskService()
 				kTaskQueue[i].delay--;
 			else {
 				if(kTaskQueue[i].state == KSTATE_ACTIVE && kTaskQueue[i].pointer != NULL){
-					kernel_addCall(kTaskQueue[i].pointer, kTaskQueue[i].priority);
+					kernel_addCall_i(kTaskQueue[i].pointer, kTaskQueue[i].priority);
 					if(kTaskQueue[i].repeatPeriod == 0) 
 						kernel_removeTask(i);
 					else 
