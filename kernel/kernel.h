@@ -61,38 +61,36 @@ void init();
 int systemInit();
 void initTaskManager();
 
-void kernel_setFlag(uint8_t flag, uint8_t value) __attribute__ ((section (".kernel")));
-uint8_t kernel_checkFlag(uint8_t flag) __attribute__ ((section (".kernel")));
-uint64_t kernel_getUptime() __attribute__ ((section (".kernel")));
+void kernel_setFlag(uint8_t flag, uint8_t value);
+uint8_t kernel_checkFlag(uint8_t flag);
+uint64_t kernel_getUptime();
 
-uint8_t kernel_addCall(kTask t_ptr, uint8_t t_priority) __attribute__ ((section (".kernel"))); 
-uint8_t kernel_addTask(uint8_t taskType, kTask t_ptr, uint16_t t_delay, uint8_t t_priority, uint8_t startupState) __attribute__ ((section (".kernel")));
-uint8_t kernel_removeCall(uint8_t t_priority) __attribute__ ((section (".kernel")));
-uint8_t kernel_removeTask(uint8_t position) __attribute__ ((section (".kernel")));
-uint8_t kernel_setTaskState(kTask t_pointer, uint8_t state) __attribute__ ((section (".kernel")));
-void kernel_clearTaskQueue() __attribute__ ((section (".kernel")));
-void kernel_clearCallQueue(uint8_t t_priority) __attribute__ ((section (".kernel")));
-void kernel_checkMCUCSR() __attribute__ ((section (".kernel")));
-uint8_t kernelInit() __attribute__ ((section (".kernel")));
+uint8_t kernel_addCall(kTask t_ptr, uint8_t t_priority); 
+uint8_t kernel_addTask(uint8_t taskType, kTask t_ptr, uint16_t t_delay, uint8_t t_priority, uint8_t startupState);
+uint8_t kernel_removeCall(uint8_t t_priority);
+uint8_t kernel_removeTask(uint8_t position);
+uint8_t kernel_setTaskState(kTask t_pointer, uint8_t state);
+void kernel_clearTaskQueue();
+void kernel_clearCallQueue(uint8_t t_priority);
+void kernel_checkMCUCSR();
+uint8_t kernelInit();
 
-void kernel_stopTimer() __attribute__ ((section (".kernel")));
-void kernel_startTimer() __attribute__ ((section (".kernel")));
-void kernel_setupTimer() __attribute__ ((section (".kernel")));
-
-void kernel_handleError(uint8_t error) __attribute__ ((section (".kernel")));
+void kernel_stopTimer();
+void kernel_startTimer();
+void kernel_setupTimer();
 
 #ifdef KERNEL_TIMER_MODULE
-	uint8_t kernel_setTimer(kTimerISR t_pointer, uint32_t t_delay) __attribute__ ((section (".kernel")));
-	uint8_t kernel_removeTimer(kTimerISR t_pointer) __attribute__ ((section (".kernel")));
-	void kernel_timerService() __attribute__ ((section (".kernel")));
+	uint8_t kernel_setTimer(kTimerISR t_pointer, uint32_t t_delay);
+	uint8_t kernel_removeTimer(kTimerISR t_pointer);
+	void kernel_timerService();
 #endif
 
 #ifdef KERNEL_SD_MODULE
-	void sd_putc(char data) __attribute__ ((section (".kernel")));
-	void sd_puts(char * data) __attribute__ ((section (".kernel")));
-	void sd_flush() __attribute__ ((section (".kernel")));
-	void sd_readPtr() __attribute__ ((section (".kernel")));
-	void sd_init() __attribute__ ((section (".kernel")));
+	void sd_putc(char data);
+	void sd_puts(char * data);
+	void sd_flush();
+	void sd_readPtr();
+	void sd_init();
 #endif
 
 #ifdef KERNEL_WDT_MODULE
@@ -103,16 +101,16 @@ void kernel_handleError(uint8_t error) __attribute__ ((section (".kernel")));
 
 #ifdef KERNEL_UTIL_MODULE
 	#define util_getArrayLength_m(arr) ((int)(sizeof(arr) / sizeof(arr)[0]))
-	uint8_t util_strCompare(char * a, char * b, uint8_t len) __attribute__ ((section (".kernel")));
+	uint8_t util_strCompare(char * a, char * b, uint8_t len);
 #endif
 
 //#ifdef KERNEL_CLI_MODULE
 	#define ERR_EMPTY_STRING 20
 	#define ERR_COMMAND_NOT_FOUND 21
-	void kernel_initCLI() __attribute__ ((section (".kernel")));
-	void kernel_registerCommand(const char * c_keyword, kCmdHandler c_ptr) __attribute__ ((section (".kernel")));
+	void kernel_initCLI();
+	void kernel_registerCommand(const char * c_keyword, kCmdHandler c_ptr);
 //#endif
-	
+
 
 #ifdef KERNEL_DEBUG_MODULE
 	#define DBG_MOD_VER "0.6.0-bleeding"
@@ -125,13 +123,13 @@ void kernel_handleError(uint8_t error) __attribute__ ((section (".kernel")));
 	#define L_WARN 2
 	#define L_ERROR 3
 	#define L_FATAL 4
-	void debug_sendMessage(char * buffer, uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
-	void debug_sendMessageSD(char * buffer, uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
-	void debug_sendMessage_p(char * buffer, uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
-	void debug_sendMessageSD_p(char * buffer, uint8_t level, const char * format, va_list args) __attribute__ ((section (".kernel")));
-	void debug_puts(uint8_t level, const char * message) __attribute__ ((section (".kernel")));
-	void debug_putsSD(uint8_t level, const char * message) __attribute__ ((section (".kernel")));
-	void debug_logMessage(uint8_t pgm, uint8_t level, const char * format, ...) __attribute__ ((section (".kernel")));
+	void debug_sendMessage(char * buffer, uint8_t level, const char * format, va_list args);
+	void debug_sendMessageSD(char * buffer, uint8_t level, const char * format, va_list args);
+	void debug_sendMessage_p(char * buffer, uint8_t level, const char * format, va_list args);
+	void debug_sendMessageSD_p(char * buffer, uint8_t level, const char * format, va_list args);
+	void debug_puts(uint8_t level, const char * message);
+	void debug_putsSD(uint8_t level, const char * message);
+	void debug_logMessage(uint8_t pgm, uint8_t level, const char * format, ...);
 #endif
 
 #endif /* KERNEL_H_ */

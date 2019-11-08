@@ -7,19 +7,16 @@
 
 #include "config.h"
 
-int exampleTask(){
+void exampleTask(){
 	debug_logMessage(PGM_ON, L_NONE, PSTR("%d This is a test.\r\n"), kernel_getUptime());
-	return 0;
 }
 
-int exampleTask1(){
+void exampleTask1(){
 	debug_logMessage(PGM_ON, L_NONE, PSTR("%d This is a test. 1\r\n"), kernel_getUptime());
-	return 0;
 }
 
-int exampleTask2(){
+void exampleTask2(){
 	debug_logMessage(PGM_ON, L_NONE, PSTR("%d This is a test. 2\r\n"), kernel_getUptime());
-	return 0;
 }
 
 int main(void){

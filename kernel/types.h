@@ -13,9 +13,9 @@
 #define CMD_MAX_WORD_SIZE 16
 
 typedef char kCmdWord_t[CMD_MAX_WORD_SIZE];
-typedef int (*kTask)(void);
+typedef void (*kTask)(void);
 typedef void (*kTimerISR)(void);
-typedef void (*kCmdHandler)();
+typedef void (*kCmdHandler)(void);
 typedef uint8_t byte;
 
 struct kTaskStruct_t {
