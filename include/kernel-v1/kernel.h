@@ -57,30 +57,33 @@
 #define KTASK_SINGLERUN 0
 #define KTASK_REPEATED 1
 
-void init();
-int systemInit();
-void initTaskManager();
+#define utils_ARRAY_INDEX_FROM_ADDR(base, addr, type) (((uint16_t)(addr)-(uint16_t)(base))/sizeof(type))
 
-void kernel_setFlag(uint8_t flag, uint8_t value);
-uint8_t kernel_checkFlag(uint8_t flag);
-uint64_t kernel_getUptime();
+void kernelv1_taskManager();
+void kernelv1_taskService();
 
-uint8_t kernel_addCall(kTask t_ptr, uint8_t t_priority); 
-uint8_t kernel_addTask(uint8_t taskType, kTask t_ptr, uint16_t t_delay, uint8_t t_priority, uint8_t startupState);
-uint8_t kernel_removeCall(uint8_t t_priority);
-uint8_t kernel_removeTask(uint8_t position);
-uint8_t kernel_setTaskState(kTask t_pointer, uint8_t state);
-void kernel_clearTaskQueue();
-void kernel_clearCallQueue(uint8_t t_priority);
-uint8_t kernelInit();
+void kernelv1_setFlag(uint8_t flag, uint8_t value);
+uint8_t kernelv1_checkFlag(uint8_t flag);
+uint64_t kernelv1_getUptime();
 
-void kernel_stopTimer();
-void kernel_startTimer();
-void kernel_setupTimer();
+uint8_t kernelv1_addCall(kv1Call_t t_ptr);
+kv1TaskHandle_t kernelv1_addTask(uint8_t taskType, void* ptr, uint16_t period, uint8_t startupState);
+uint8_t kernelv1_removeCall();
+void kernelv1_removeTaskByPos(uint8_t position);
+uint8_t kernelv1_removeTaskByPtr(void* t_pointer);
+uint8_t kernelv1_removeTask(kv1TaskHandle_t handle);
+void kernelv1_setTaskState(kv1TaskHandle_t handle, uint8_t newState);
+void kernelv1_clearCallQueue();
+void kernelv1_clearTaskQueue();
+void kernelv1_init();
+
+void kernelv1_startTimer();
+void kernelv1_stopTimer();
+void kernelv1_setupTimer();
 
 #ifdef KERNEL_TIMER_MODULE
-	uint8_t kernel_setTimer(kTimerISR t_pointer, uint32_t t_delay);
-	uint8_t kernel_removeTimer(kTimerISR t_pointer);
+	uint8_t kernel_setTimer(kv1TimerISR t_pointer, uint32_t t_delay);
+	uint8_t kernel_removeTimer(kv1TimerISR t_pointer);
 	void kernel_timerService();
 #endif
 
@@ -106,14 +109,14 @@ void kernel_setupTimer();
 //#ifdef KERNEL_CLI_MODULE
 	#define ERR_EMPTY_STRING 20
 	#define ERR_COMMAND_NOT_FOUND 21
-	void kernel_initCLI();
-	void kernel_registerCommand(const char * c_keyword, kCmdHandler c_ptr);
+	void cli_init();
+	void cli_registerCommand(const char * c_keyword, kv1CmdHandler c_ptr);
 //#endif
 
 
 #ifdef KERNEL_DEBUG_MODULE
-	#define DBG_MOD_VER "0.6.0-bleeding"
-	#define DBG_MOD_TIMESTAMP __TIMESTAMP__
+	#define threads_enterCriticalSection()
+	#define threads_exitCriticalSection()
 	#define PGM_ON 1
 	#define PGM_OFF 0
 	#define PGM_PUTS 2
@@ -122,12 +125,8 @@ void kernel_setupTimer();
 	#define L_WARN 2
 	#define L_ERROR 3
 	#define L_FATAL 4
-	void debug_sendMessage(char * buffer, uint8_t level, const char * format, va_list args);
-	void debug_sendMessageSD(char * buffer, uint8_t level, const char * format, va_list args);
-	void debug_sendMessage_p(char * buffer, uint8_t level, const char * format, va_list args);
-	void debug_sendMessageSD_p(char * buffer, uint8_t level, const char * format, va_list args);
+	
 	void debug_puts(uint8_t level, const char * message);
-	void debug_putsSD(uint8_t level, const char * message);
 	void debug_logMessage(uint8_t pgm, uint8_t level, const char * format, ...);
 #endif
 

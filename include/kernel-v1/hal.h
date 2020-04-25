@@ -71,6 +71,9 @@
 #define hal_disableInterrupts() cli()
 #define hal_enableInterrupts() sei()
 
+#define hal_READ_BYTE_FROM_FLASH(x) pgm_read_byte(x)
+#define hal_READ_WORD_FROM_FLASH(x) pgm_read_word(x)
+
 #define hal_statusReg SREG
 #define hal_nop() asm volatile ("NOP")
 #define delay_ms(x) _delay_ms(x);
@@ -107,6 +110,7 @@ int hal_basicUart_init(unsigned int ubrr);
 
 #ifndef hal_uart_putc
 #define hal_uart_putc(c) hal_basicUart_putc(c)
+#define hal_UART_PUTC(c) hal_basicUart_putc(c)
 void hal_basicUart_putc(char c);
 #endif
 

@@ -14,17 +14,15 @@
 
 	//Kernel modules - set to 0 to disable
 	#define KERNEL_SD_MODULE 0
-	#define KERNEL_WDT_MODULE 1
+	#define KERNEL_WDT_MODULE 0
 	#define KERNEL_UTIL_MODULE 0
 	#define KERNEL_DEBUG_MODULE 1
 	#define KERNEL_CLI_MODULE 0
-	#define KERNEL_TIMER_MODULE 1
+	#define KERNEL_TIMER_MODULE 0
 
 	//Task manager settings
 	#define MAX_TASK_QUEUE_SIZE 4
-	#define MAX_HIGHPRIO_CALL_QUEUE_SIZE 8
-	#define MAX_NORMPRIO_CALL_QUEUE_SIZE 0
-	#define MAX_LOWPRIO_CALL_QUEUE_SIZE 1
+	#define MAX_CALL_QUEUE_SIZE 8
 	
 	//Timer settings
 	#define MAX_TIMER_COUNT 1
