@@ -27,19 +27,6 @@ const char * const levels[] PROGMEM = {
 	log_levelfatal
 };
 
-const char log_stageInit[] PROGMEM = "<INIT>";
-const char log_stageRun[] PROGMEM = "<EXEC>";
-const char log_stageHalt[] PROGMEM = "<HALT>";
-const char log_stageErr[] PROGMEM = "<ERROR>";
-
-
-const char * const stages[] PROGMEM = {
-	log_stageInit,
-	log_stageRun,
-	log_stageHalt,
-	log_stageErr,
-};
-
 void debug_sendMessage(uint8_t level, const char * format, va_list args);
 void debug_sendMessage_p(uint8_t level, const char * format, va_list args);
 
