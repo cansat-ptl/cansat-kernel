@@ -17,7 +17,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <util/delay.h>
-#include "kernel/kernel.h"
+#include <kernel-v1/kernel.h>
 //----------------------------------------------------------------
 
 #endif /* CONFIG_H_ */

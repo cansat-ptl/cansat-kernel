@@ -5,8 +5,8 @@
  *  Author: ThePetrovich
  */ 
 
-#include "../kernel.h"
-#include "../hal.h"
+#include <kernel-v1/kernel.h>
+#include <kernel-v1/hal.h>
 
 void init()
 {
@@ -15,7 +15,6 @@ void init()
 	hal_uart_init(12);
 	sd_init();
 	wdt_reset();
-	kernel_checkMCUCSR();
 	
 	hal_enableInterrupts();
 	delay_ms(10);

@@ -7,8 +7,8 @@
 
 #include <stdarg.h>
 #include <stdlib.h>
-#include "../kernel.h"
-#include "../hal.h"
+#include <kernel-v1/kernel.h>
+#include <kernel-v1/hal.h>
 
 void sd_puts(char * data);
 void sd_flush();

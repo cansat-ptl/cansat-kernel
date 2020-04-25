@@ -20,8 +20,8 @@
 /                     Changed stream read mode interface.
 /----------------------------------------------------------------------------*/
 
-#include "pff.h"		/* Petit FatFs configurations and declarations */
-#include "diskio.h"		/* Declarations of low level disk I/O functions */
+#include <pff3a/pff.h>	/* Petit FatFs configurations and declarations */
+#include <pff3a/diskio.h>		/* Declarations of low level disk I/O functions */
 
 /*--------------------------------------------------------------------------
 

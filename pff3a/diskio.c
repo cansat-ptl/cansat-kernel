@@ -4,7 +4,7 @@
 #define _WRITE_FUNC	1			//allow write operations
 
 #include <avr/io.h>
-#include "diskio.h"
+#include <pff3a/diskio.h>
 
 // Definitions for MMC/SDC connection
 #define SD_DI   1

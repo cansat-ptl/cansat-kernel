@@ -15,7 +15,7 @@
     <AssemblyName>yktcansat-staging</AssemblyName>
     <Name>yktcansat-staging</Name>
     <RootNamespace>yktcansat-staging</RootNamespace>
-    <ToolchainFlavour>Native</ToolchainFlavour>
+    <ToolchainFlavour>avrgcc-920</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
     <OverrideVtorValue>exception_table</OverrideVtorValue>
@@ -48,15 +48,15 @@
     <EraseKey />
     <AsfFrameworkConfig>
       <framework-data>
-        <options />
-        <configurations />
-        <files />
-        <documentation help="" />
-        <offline-documentation help="" />
-        <dependencies>
-          <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.34.1" />
-        </dependencies>
-      </framework-data>
+  <options />
+  <configurations />
+  <files />
+  <documentation help="" />
+  <offline-documentation help="" />
+  <dependencies>
+    <content-extension eid="atmel.asf" uuidref="Atmel.ASF" version="3.39.0" />
+  </dependencies>
+</framework-data>
     </AsfFrameworkConfig>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
@@ -75,10 +75,12 @@
             <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.2.209\include</Value>
           </ListValues>
         </avrgcc.compiler.directories.IncludePaths>
-        <avrgcc.compiler.optimization.level>Optimize more (-O2)</avrgcc.compiler.optimization.level>
+        <avrgcc.compiler.optimization.level>Optimize most (-O3)</avrgcc.compiler.optimization.level>
         <avrgcc.compiler.optimization.PackStructureMembers>True</avrgcc.compiler.optimization.PackStructureMembers>
         <avrgcc.compiler.optimization.AllocateBytesNeededForEnum>True</avrgcc.compiler.optimization.AllocateBytesNeededForEnum>
         <avrgcc.compiler.warnings.AllWarnings>True</avrgcc.compiler.warnings.AllWarnings>
+        <avrgcc.compiler.warnings.ExtraWarnings>True</avrgcc.compiler.warnings.ExtraWarnings>
+        <avrgcc.compiler.warnings.Pedantic>True</avrgcc.compiler.warnings.Pedantic>
         <avrgcc.compiler.miscellaneous.Verbose>True</avrgcc.compiler.miscellaneous.Verbose>
         <avrgcc.linker.general.NoSharedLibraries>True</avrgcc.linker.general.NoSharedLibraries>
         <avrgcc.linker.general.UseVprintfLibrary>True</avrgcc.linker.general.UseVprintfLibrary>
@@ -120,6 +122,7 @@
   <avrgcc.compiler.directories.IncludePaths>
     <ListValues>
       <Value>%24(PackRepoDir)\atmel\ATmega_DFP\1.2.209\include</Value>
+      <Value>../include</Value>
     </ListValues>
   </avrgcc.compiler.directories.IncludePaths>
   <avrgcc.compiler.optimization.level>Optimize for size (-Os)</avrgcc.compiler.optimization.level>
@@ -157,43 +160,52 @@
     <Compile Include="config.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\hal.h">
+    <Compile Include="include\kernel-v1\hal.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\kernel.h">
+    <Compile Include="include\kernel-v1\kernel.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\kernel_config.h">
+    <Compile Include="include\kernel-v1\kernel_config.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\src\commands.c">
+    <Compile Include="include\kernel-v1\types.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\src\debug.c">
+    <Compile Include="include\pff3a\diskio.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\src\hal.c">
+    <Compile Include="include\pff3a\integer.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\src\init.c">
+    <Compile Include="include\pff3a\pff.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\src\kernel.c">
+    <Compile Include="kernel-v1\commands.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\src\sdcard.c">
+    <Compile Include="kernel-v1\debug.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\src\timers.c">
+    <Compile Include="kernel-v1\hal.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\src\utils.c">
+    <Compile Include="kernel-v1\init.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\src\watchdog.c">
+    <Compile Include="kernel-v1\kernel.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel\types.h">
+    <Compile Include="kernel-v1\sdcard.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="kernel-v1\timers.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="kernel-v1\utils.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="kernel-v1\watchdog.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="main.c">
@@ -202,24 +214,17 @@
     <Compile Include="pff3a\diskio.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="pff3a\diskio.h">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="pff3a\integer.h">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="pff3a\pff.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="pff3a\pff.h">
       <SubType>compile</SubType>
     </Compile>
   </ItemGroup>
   <ItemGroup>
     <Folder Include="boot\src" />
-    <Folder Include="kernel" />
-    <Folder Include="kernel\src" />
+    <Folder Include="include\kernel-v1" />
+    <Folder Include="include\pff3a" />
+    <Folder Include="kernel-v1" />
     <Folder Include="boot" />
+    <Folder Include="include" />
     <Folder Include="pff3a" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />

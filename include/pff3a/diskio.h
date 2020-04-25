@@ -4,7 +4,7 @@
 
 #ifndef _DISKIO
 
-#include "integer.h"
+#include <pff3a/integer.h>
 #include <avr/interrupt.h>
 
 /* Status of Disk Functions */

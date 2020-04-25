@@ -4,8 +4,8 @@
  * Created: 18.08.2019 22:44:40
  *  Author: WorldSkills-2019
  */ 
-#include "../kernel.h"
-#include "../hal.h"
+#include <kernel-v1/kernel.h>
+#include <kernel-v1/hal.h>
 
 #if KERNEL_CLI_MODULE == 1
 
