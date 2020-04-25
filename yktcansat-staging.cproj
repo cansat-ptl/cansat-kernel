@@ -190,9 +190,6 @@
     <Compile Include="kernel-v1\hal.c">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="kernel-v1\init.c">
-      <SubType>compile</SubType>
-    </Compile>
     <Compile Include="kernel-v1\kernel.c">
       <SubType>compile</SubType>
     </Compile>
@@ -200,9 +197,6 @@
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="kernel-v1\timers.c">
-      <SubType>compile</SubType>
-    </Compile>
-    <Compile Include="kernel-v1\utils.c">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="kernel-v1\watchdog.c">

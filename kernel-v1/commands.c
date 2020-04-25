@@ -62,7 +62,7 @@ static int cli_processCommand()
 	return ERR_COMMAND_NOT_FOUND;
 }
 
-void cli_registerCommand(const char * c_keyword, kv1CmdHandler c_ptr)
+void cli_registerCommand(const char * c_keyword, kv1CmdHandler_t c_ptr)
 {
 	if(registeredCmds < CMD_COMMAND_AMOUNT+1){
 		debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Registered command %s, handler at 0x%X\r\n"), c_keyword, (int)c_ptr);

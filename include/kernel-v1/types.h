@@ -14,9 +14,10 @@
 
 typedef char kv1CmdWord_t[CMD_MAX_WORD_SIZE];
 typedef struct kv1TaskStruct_t* kv1Call_t;
-typedef void (*kv1TimerISR)(void);
-typedef void (*kv1CmdHandler)(void);
 typedef struct kv1TaskStruct_t* kv1TaskHandle_t;
+typedef struct kv1TimerStruct_t* kv1TimerHandle_t;
+typedef void (*kv1TimerISR_t)(void);
+typedef void (*kv1CmdHandler_t)(void);
 typedef uint8_t byte;
 
 struct kv1TaskStruct_t {
@@ -28,14 +29,14 @@ struct kv1TaskStruct_t {
 };
 
 struct kv1TimerStruct_t {
-	kv1TimerISR tsrPointer;
+	kv1TimerISR_t tsrPointer;
 	uint32_t period;
 	uint32_t repeatPeriod;
 };
 
 struct kCommandStruct_t {
 	kv1CmdWord_t keyword;
-	kv1CmdHandler handler;
+	kv1CmdHandler_t handler;
 	uint8_t length;
 };
 

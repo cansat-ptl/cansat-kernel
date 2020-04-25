@@ -82,8 +82,8 @@ void kernelv1_stopTimer();
 void kernelv1_setupTimer();
 
 #ifdef KERNEL_TIMER_MODULE
-	uint8_t kernel_setTimer(kv1TimerISR t_pointer, uint32_t t_delay);
-	uint8_t kernel_removeTimer(kv1TimerISR t_pointer);
+	uint8_t kernel_setTimer(kv1TimerISR_t t_pointer, uint32_t t_delay);
+	uint8_t kernel_removeTimer(kv1TimerISR_t t_pointer);
 	void kernel_timerService();
 #endif
 
@@ -110,7 +110,7 @@ void kernelv1_setupTimer();
 	#define ERR_EMPTY_STRING 20
 	#define ERR_COMMAND_NOT_FOUND 21
 	void cli_init();
-	void cli_registerCommand(const char * c_keyword, kv1CmdHandler c_ptr);
+	void cli_registerCommand(const char * c_keyword, kv1CmdHandler_t c_ptr);
 //#endif
 
 
