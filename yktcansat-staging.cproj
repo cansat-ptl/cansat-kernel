@@ -15,7 +15,7 @@
     <AssemblyName>yktcansat-staging</AssemblyName>
     <Name>yktcansat-staging</Name>
     <RootNamespace>yktcansat-staging</RootNamespace>
-    <ToolchainFlavour>avrgcc-920</ToolchainFlavour>
+    <ToolchainFlavour>Native</ToolchainFlavour>
     <KeepTimersRunning>true</KeepTimersRunning>
     <OverrideVtor>false</OverrideVtor>
     <OverrideVtorValue>exception_table</OverrideVtorValue>

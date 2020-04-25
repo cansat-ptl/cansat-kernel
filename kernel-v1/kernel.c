@@ -101,7 +101,7 @@ kv1TaskHandle_t kernelv1_addTask(uint8_t taskType, void* ptr, uint16_t period, u
 	if(taskType == KTASK_REPEATED) dummyTask.repeatPeriod = period - 1;
 
 	for (int i = 0; i < MAX_TASK_QUEUE_SIZE; i++) {
-		if (ptr == kv1TaskList[i].pointer || kv1TaskList[i].pointer == kv1Idle) {
+		if (ptr == kv1TaskList[i].pointer || kv1TaskList[i].pointer == kv1Idle || kv1TaskList[i].pointer == NULL) {
 			kv1TaskList[i] = dummyTask;
 			handle = &kv1TaskList[i];
 			break;
@@ -260,6 +260,9 @@ void kernelv1_init()
 	kernelv1_setFlag(KFLAG_INIT, 1);
 	kernelv1_setFlag(KFLAG_TIMER_SET, 0);
 	kernelv1_setFlag(KFLAG_TIMER_EN, 0);
+	
+	kv1IdleTask.pointer = kv1Idle;
+	
 	#if LOGGING == 1
 		debug_logMessage(PGM_ON, L_NONE, (char *)PSTR("\r\n[INIT]kernel: Starting up CanSat kernel v%s\r\n\r\n"), KERNEL_VER);
 	#endif
