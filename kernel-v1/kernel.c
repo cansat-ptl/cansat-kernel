@@ -15,8 +15,8 @@ extern uint8_t mcucsr_mirror;
 
 static uint8_t kv1CallIndex = 0;
 static volatile uint8_t kv1TaskIndex = 0; //Index of the last task in queue
-static volatile kv1Call_t kv1CallQueue[10]; //TODO: replace with #define
-static volatile struct kv1TaskStruct_t kv1TaskList[10]; //TODO: replace with #define
+static volatile kv1Call_t kv1CallQueue[MAX_CALL_QUEUE_SIZE]; //TODO: replace with #define
+static volatile struct kv1TaskStruct_t kv1TaskList[MAX_TASK_QUEUE_SIZE]; //TODO: replace with #define
 static struct kv1TaskStruct_t kv1IdleTask;
 
 void kv1Idle()
@@ -118,15 +118,12 @@ uint8_t kernelv1_removeCall() //TODO: cyclic buffer
 	uint8_t sreg = hal_statusReg;
 	hal_disableInterrupts();
 
-	if(kv1CallIndex != 0){
+	if(kv1CallIndex > 0){
 		kv1CallIndex--;
 		for(int i = 0; i < MAX_CALL_QUEUE_SIZE-1; i++){
 			kv1CallQueue[i] = kv1CallQueue[i+1];
 		}
 		kv1CallQueue[MAX_CALL_QUEUE_SIZE-1] = &kv1IdleTask;
-	}
-	else {
-		kv1CallQueue[0] =  &kv1IdleTask;
 	}
 
 	hal_enableInterrupts();
@@ -228,9 +225,11 @@ void kernelv1_setTaskState(kv1TaskHandle_t handle, uint8_t newState)
 
 void kernelv1_taskManager()
 {
-	(*(kv1CallQueue[0] -> pointer))();
-	if (kv1CallQueue[0] -> state == 255) kernelv1_removeTask(kv1CallQueue[0]);
-	kernelv1_removeCall();
+	if (kv1CallIndex != 0) {
+		(*(kv1CallQueue[0] -> pointer))();
+		if (kv1CallQueue[0] -> state == 254) kernelv1_removeTask(kv1CallQueue[0]);
+		kernelv1_removeCall();
+	}
 }
 
 void kernelv1_startTimer()

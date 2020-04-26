@@ -82,9 +82,9 @@ void kernelv1_stopTimer();
 void kernelv1_setupTimer();
 
 #ifdef KERNEL_TIMER_MODULE
-	uint8_t kernel_setTimer(kv1TimerISR_t t_pointer, uint32_t t_delay);
-	uint8_t kernel_removeTimer(kv1TimerISR_t t_pointer);
-	void kernel_timerService();
+	kv1TimerHandle_t kernelv1_setTimer(kv1TimerISR_t t_pointer, uint32_t t_period);
+	void kernelv1_removeTimer(kv1TimerHandle_t handle);
+	void kernelv1_timerService();
 #endif
 
 #ifdef KERNEL_SD_MODULE

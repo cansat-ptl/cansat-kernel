@@ -34,7 +34,6 @@ kv1TimerHandle_t kernelv1_setTimer(kv1TimerISR_t t_pointer, uint32_t t_period)
 
 void kernelv1_removeTimer(kv1TimerHandle_t handle)
 {
-	uint8_t exitcode;
 	uint8_t sreg = hal_statusReg;
 	hal_disableInterrupts();
 

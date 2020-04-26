@@ -17,7 +17,7 @@ volatile static char recvBuffer[RX0_BUFFER_SIZE];
 volatile static uint8_t recvBuffer_i = 0;
 static struct kCommandStruct_t commands[CMD_COMMAND_AMOUNT];
 static uint8_t registeredCmds = 0;
-static struct kv1TaskStruct_t dummyTask;
+static volatile struct kv1TaskStruct_t dummyTask;
 
 static void cli_clearRecvBuffer(){
 	for(int i = 0; i < RX0_BUFFER_SIZE; i++) recvBuffer[i] = 0;
@@ -29,7 +29,7 @@ static int cli_processCommand()
 	//uint8_t c_argc = 0;
 	//debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Received string: %s\r\n"), recvBuffer);
 	char * token = strtok((char *)recvBuffer, " ");
-	if(token == NULL){
+	if (token == NULL) {
 		cli_clearRecvBuffer();
 		debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Enter a command\r\n"));
 		debug_logMessage(PGM_ON, L_NONE, PSTR("\r\nroot@cansat:< "));
@@ -37,9 +37,9 @@ static int cli_processCommand()
 	}
 	debug_logMessage(PGM_ON, L_NONE, PSTR("\r\n"));
 	//debug_logMessage(PGM_ON, L_NONE, PSTR("Here 2\r\n"));
-	for(int i = 0; i < registeredCmds; i++){
+	for (int i = 0; i < registeredCmds; i++) {
 		//debug_logMessage(PGM_ON, L_NONE, PSTR("Comparing %s and %s\r\n"), token, commands[i].keyword);
-		if(strcmp(commands[i].keyword, token) == 0){
+		if (strcmp(commands[i].keyword, token) == 0) {
 			//while(token != NULL){
 			//	strtok(NULL, " ");
 			//	c_argc++;
@@ -64,7 +64,7 @@ static int cli_processCommand()
 
 void cli_registerCommand(const char * c_keyword, kv1CmdHandler_t c_ptr)
 {
-	if(registeredCmds < CMD_COMMAND_AMOUNT+1){
+	if (registeredCmds < CMD_COMMAND_AMOUNT+1) {
 		debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Registered command %s, handler at 0x%X\r\n"), c_keyword, (int)c_ptr);
 		commands[registeredCmds].handler = c_ptr;
 		strcpy(commands[registeredCmds].keyword, c_keyword);
@@ -292,6 +292,7 @@ void cli_init()
 {
 	wdt_reset();
 	delay_ms(500);
+	dummyTask.pointer = cli_processCommand;
 	debug_logMessage(PGM_ON, L_NONE, PSTR("\x0C"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR("Initializing shell...\r\n\r\n"));
 	cli_registerCommand("config", cliBuiltIn_config);	
@@ -331,7 +332,6 @@ ISR(USART0_RX_vect)
 		recvBuffer[recvBuffer_i-1] = '\0';
 		hal_uart_disableInterruptsRX();
 		//kernel_processCommand();
-		dummyTask.pointer = cli_processCommand;
 		kernelv1_addCall(&dummyTask);
 	}
 	//debug_logMessage(PGM_ON, L_INFO, PSTR("RX0_ISR\r\n"));

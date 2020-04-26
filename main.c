@@ -3,7 +3,7 @@
  *
  * Created: 07.03.2019 17:56:34
  *  Author: ThePetrovich
- */ 
+ */
 
 #include "config.h"
 
@@ -23,13 +23,14 @@ void exampleTask2(){
 
 int main(void){
 	hal_enableInterrupts();
-	hal_uart_init(6);
+	hal_uart_init(12);
 	debug_init();
 	kernelv1_init();
-	kernelv1_addTask(KTASK_REPEATED, exampleTask, 2000, KSTATE_ACTIVE);	
-	kernelv1_addTask(KTASK_REPEATED, exampleTask1, 500, KSTATE_ACTIVE);	
-	kernelv1_addTask(KTASK_REPEATED, exampleTask2, 1250, KSTATE_ACTIVE);	
-	
+	cli_init();
+	kernelv1_addTask(KTASK_REPEATED, exampleTask, 2000, KSTATE_ACTIVE);
+	kernelv1_addTask(KTASK_REPEATED, exampleTask1, 500, KSTATE_ACTIVE);
+	kernelv1_addTask(KTASK_REPEATED, exampleTask2, 1250, KSTATE_ACTIVE);
+
 	while(1) {
 		kernelv1_taskManager();
 	}

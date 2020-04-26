@@ -128,6 +128,4 @@ void hal_basicUart_enableInterruptsRX();
 #define hal_uart_disableInterruptsRX(s) hal_basicUart_disableInterruptsRX()
 void hal_basicUart_disableInterruptsRX();
 #endif
-
-void hal_setupPins();
 #endif /* HAL_H_ */
