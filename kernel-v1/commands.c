@@ -26,8 +26,6 @@ static void cli_clearRecvBuffer(){
 }
 static int cli_processCommand()
 {
-	//uint8_t c_argc = 0;
-	//debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Received string: %s\r\n"), recvBuffer);
 	char * token = strtok((char *)recvBuffer, " ");
 	if (token == NULL) {
 		cli_clearRecvBuffer();
@@ -36,23 +34,12 @@ static int cli_processCommand()
 		return 0;
 	}
 	debug_logMessage(PGM_ON, L_NONE, PSTR("\r\n"));
-	//debug_logMessage(PGM_ON, L_NONE, PSTR("Here 2\r\n"));
 	for (int i = 0; i < registeredCmds; i++) {
-		//debug_logMessage(PGM_ON, L_NONE, PSTR("Comparing %s and %s\r\n"), token, commands[i].keyword);
 		if (strcmp(commands[i].keyword, token) == 0) {
-			//while(token != NULL){
-			//	strtok(NULL, " ");
-			//	c_argc++;
-			//}
-			//debug_logMessage(PGM_ON, L_INFO, PSTR("cli: Parsing result: %s\r\n"), token);
 			(commands[i].handler)();
 			cli_clearRecvBuffer();
 			debug_logMessage(PGM_ON, L_NONE, PSTR("\r\nroot@cansat:< "));
 			return 0;
-		}
-		else {
-			//debug_logMessage(PGM_ON, L_INFO, PSTR("cli: Parsing result: %s\r\n"), token);
-			//debug_logMessage(PGM_ON, L_ERROR, PSTR("cli: Buffer length: %d\r\n"), recvBuffer_i);
 		}
 	}
 
@@ -77,7 +64,6 @@ char cli_parseCmdArgs(char * token, char * arglist, uint8_t arglist_len){
 	for(int i = 0; i < arglist_len; i++){
 		if(token[1] == arglist[i]){
 			return arglist[i];
-			//debug_logMessage(PGM_ON, L_INFO, PSTR("cli: Parsed argument %c\r\n"), arglist[i]);
 		}
 		else if(i == arglist_len-1){
 			return '\0';
