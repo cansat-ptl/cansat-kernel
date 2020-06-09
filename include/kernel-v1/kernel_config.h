@@ -17,7 +17,7 @@
 	#define KERNEL_WDT_MODULE 0
 	#define KERNEL_UTIL_MODULE 0
 	#define KERNEL_DEBUG_MODULE 1
-	#define KERNEL_CLI_MODULE 1
+	#define KERNEL_CLI_MODULE 0
 	#define KERNEL_TIMER_MODULE 1
 
 	//Task manager settings

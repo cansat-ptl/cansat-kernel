@@ -3,18 +3,18 @@
  *
  * Created: 11.05.2019 21:15:24
  *  Author: ThePetrovich
- */ 
+ */
 
 #ifndef KERNEL_H_
 #define KERNEL_H_
 
-#define KERNEL_VER "0.6.0-bleeding"
+#define KERNEL_VER "0.7.0-bleeding"
 #define KERNEL_TIMESTAMP __TIMESTAMP__
 
 #define SDCARD_MOD_VER "0.0.5-rc1"
 #define SDCARD_MOD_TIMESTAMP __TIMESTAMP__
 
-#define CMD_MOD_VER "0.0.2-bleeding"
+#define CMD_MOD_VER "0.0.3-bleeding"
 #define CMD_MOD_TIMESTAMP __TIMESTAMP__
 
 #include <kernel-v1/types.h>
@@ -36,11 +36,11 @@
 #define ERR_BOD_RESET 4
 #define ERR_KRN_RETURN 5
 #define ERR_DEVICE_FAIL 6
-	
+
 #define KPRIO_HIGH 0
 #define KPRIO_NORM 1
 #define KPRIO_LOW 2
-	
+
 #define KFLAG_INIT 0
 #define KFLAG_TIMER_SET 1
 #define KFLAG_TIMER_EN 2
@@ -50,7 +50,7 @@
 #define KFLAG_LOG_SD 13
 #define KFLAG_LOG_UART 14
 #define KFLAG_DEBUG 15
-	
+
 #define KSTATE_ACTIVE 1
 #define KSTATE_SUSPENDED 0
 
@@ -125,7 +125,7 @@ void kernelv1_setupTimer();
 	#define L_WARN 2
 	#define L_ERROR 3
 	#define L_FATAL 4
-	
+
 	void debug_puts(uint8_t level, const char * message);
 	void debug_logMessage(uint8_t pgm, uint8_t level, const char * format, ...);
 #endif

@@ -3,7 +3,7 @@
  *
  * Created: 18.08.2019 22:44:40
  *  Author: WorldSkills-2019
- */ 
+ */
 #include <kernel-v1/kernel.h>
 #include <kernel-v1/hal.h>
 
@@ -31,8 +31,8 @@ static int cli_processCommand()
 	char * token = strtok((char *)recvBuffer, " ");
 	if (token == NULL) {
 		cli_clearRecvBuffer();
-		debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Enter a command\r\n"));
-		debug_logMessage(PGM_ON, L_NONE, PSTR("\r\nroot@cansat:< "));
+		//debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Enter a command\r\n"));
+		debug_logMessage(PGM_ON, L_NONE, PSTR("root@cansat:< "));
 		return 0;
 	}
 	debug_logMessage(PGM_ON, L_NONE, PSTR("\r\n"));
@@ -55,7 +55,7 @@ static int cli_processCommand()
 			//debug_logMessage(PGM_ON, L_ERROR, PSTR("cli: Buffer length: %d\r\n"), recvBuffer_i);
 		}
 	}
-	
+
 	cli_clearRecvBuffer();
 	debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Command not found\r\n"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR("\r\nroot@cansat:< "));
@@ -95,13 +95,13 @@ static void cliBuiltIn_config()
 
 	while(token != NULL){
 		token = strtok(NULL, " ");
-		
+
 		if(token[0] == '-'){
 			activeArgument = cli_parseCmdArgs(token, arglist, arglist_len);
 			uint8_t a = 0;
 			switch(activeArgument){
 				case '\0':
-					debug_logMessage(PGM_PUTS, L_NONE, PSTR("cli: Unknown argument: %s\r\n"), token);
+					debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Unknown argument: %s\r\n"), token);
 					return;
 				break;
 				case 'a':
@@ -114,7 +114,7 @@ static void cliBuiltIn_config()
 						debug_logMessage(PGM_ON, L_NONE, PSTR("cli: success\r\n"));
 					}
 					else debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Error: no argument value specified\r\n"));
-					
+
 				break;
 				case 'b':
 					debug_logMessage(PGM_ON, L_NONE, PSTR("cli: '-b' specified, executing B subroutine\r\n"));
@@ -138,7 +138,7 @@ static void cliBuiltIn_debug()
 	char arglist[] = "dv";
 	char activeArgument = '\0';
 	uint8_t arglist_len = strlen(arglist);
-	
+
 	while(token != NULL){
 		token = strtok(NULL, " ");
 		if(token[0] == '-'){
@@ -155,7 +155,7 @@ static void cliBuiltIn_debug()
 						if(strcmp(ds, "on") == 0){
 							debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Enabling debug output\r\n"));
 							kernelv1_setFlag(KFLAG_DEBUG, 1);
-						} 
+						}
 						else if(strcmp(ds, "off") == 0){
 							debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Disabling debug output\r\n"));
 							kernelv1_setFlag(KFLAG_DEBUG, 0);
@@ -163,7 +163,7 @@ static void cliBuiltIn_debug()
 						else {
 							debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Unknown argument value, should be either 'on' or 'off'\r\n"));
 						}
-			
+
 					}
 					else debug_logMessage(PGM_ON, L_NONE, PSTR("cli: Error: no argument value specified\r\n"));
 				break;
@@ -252,7 +252,7 @@ void cliBuiltIn_dickbutt()
 	debug_logMessage(PGM_ON, L_NONE, PSTR("  MMM                                .MMM        \r\n"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR(" MMM                      MM        .MMM         \r\n"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR(" MMM                     .MM  MM.   MMM~         \r\n"));
-	debug_logMessage(PGM_ON, L_NONE, PSTR("  MMM                     MMM .MM.   MMM                         MMMMM     \r\n"));
+	debug_logMessage(PGM_ON, L_NONE, PSTR(" MMM                     MMM .MM.   MMM                         MMMMM     \r\n"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR(" MMM                     MM. MMM   MMM                        MMM   MMO   \r\n"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR(" MMM                     MM  MM   .MMM                      MMMM     MM   \r\n"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR(" MM~                    MM. MMM   MMM.                     MMM      IMM   \r\n"));
@@ -293,9 +293,8 @@ void cli_init()
 	wdt_reset();
 	delay_ms(500);
 	dummyTask.pointer = cli_processCommand;
-	debug_logMessage(PGM_ON, L_NONE, PSTR("\x0C"));
 	debug_logMessage(PGM_ON, L_NONE, PSTR("Initializing shell...\r\n\r\n"));
-	cli_registerCommand("config", cliBuiltIn_config);	
+	cli_registerCommand("config", cliBuiltIn_config);
 	cli_registerCommand("debug", cliBuiltIn_debug);
 	cli_registerCommand("reboot", cliBuiltIn_reboot);
 	cli_registerCommand("datetime", cliBuiltIn_datetime);

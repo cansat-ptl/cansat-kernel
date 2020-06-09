@@ -51,7 +51,7 @@ uint64_t kernelv1_getUptime()
 	return e_time;
 }
 
-static inline void kernelv1_resetTaskByPosition(uint8_t position)
+static void kernelv1_resetTaskByPosition(uint8_t position)
 {
 	kv1TaskList[position].pointer = kv1Idle;
 	kv1TaskList[position].delay = 0;
@@ -275,7 +275,7 @@ void kernelv1_init()
 	kernelv1_clearCallQueue();
 
 	#if LOGGING == 1
-		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("         [DONE]\r\n"));
+		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("                  [DONE]\r\n"));
 		debug_logMessage(PGM_PUTS, L_NONE, (char *)PSTR("[INIT]kernel: Setting up task queue"));
 	#endif
 
